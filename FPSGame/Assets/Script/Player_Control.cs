@@ -25,6 +25,7 @@ public class Player_Control : NetworkBehaviour
     [SyncVar]
     public int HP;  //플레이어의 체력
 
+    public GameObject Attack_point; //혹시 피격을 위한 오브젝트
     public Rigidbody player;   //플레이어 몸뚱아리
     public Rigidbody weapon;   //무기
 
