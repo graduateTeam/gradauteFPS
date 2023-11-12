@@ -12,6 +12,8 @@ using Unity.VisualScripting;
 * 클라이언트에서 그런 중요정보를 처리하지 않음으로써
 * 메이플의 클라이언트 변조사건 등을 막을 수 있다.
 */
+
+/*리스폰 코루틴 부분 살짝 불안 나중에 주의깊게 쳐다볼 것*/
 public class Player_Control : NetworkBehaviour
 {
     // Start is called before the first frame update
@@ -21,6 +23,7 @@ public class Player_Control : NetworkBehaviour
     public bool wasd; //점프 시 wasd 막기
     public float jumpPower; //점프력
     public float lim_Speed; //최대 속력
+    public float Respawn_Time;    //리스폰 시간
 
     [SyncVar]
     public int HP;  //플레이어의 체력
@@ -39,6 +42,10 @@ public class Player_Control : NetworkBehaviour
     {
         player_movement();
 
+        if (HP <= 0)
+        {
+            CmdplayerDies();
+        }            
     }
 
     private void getStart()
@@ -51,8 +58,8 @@ public class Player_Control : NetworkBehaviour
 
         player = GetComponent<Rigidbody>();
         weapon = GetComponent<Rigidbody>();
+        Attack_point = GetComponent<GameObject>();
     }
-
     private void player_movement()
     {
         if (!isLocalPlayer) return;
@@ -91,7 +98,7 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
-    private void OnCollisionStart(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (alive)   //땅 혹은 지형지물에 다시 닿으면 점프 다시 활성화
         {
@@ -110,14 +117,19 @@ public class Player_Control : NetworkBehaviour
         if (player.velocity.magnitude < lim_Speed) player.velocity = move;
     }
 
+    public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수
+    {
+        CmdReduceHP(damage);
+    }
+
     [Command]
     void CmdReduceHP(int damage)
     {
         HP -= damage;
     }
 
-    [Command]
-    void CmdFire()
+    [Command]   //Command가 있으면 클라이언트에서 호출하지만 처리는 서버(Mirror)에서 함
+    void CmdFire()  //총알 발사 서버에서의 처리
     {
         GameObject bullet = Bullet_Pool.instance.GetBullet();
 
@@ -143,5 +155,38 @@ public class Player_Control : NetworkBehaviour
     void CmdBulletMoveOnServer(Vector3 b_move, GameObject bullet)
     {
         bullet.GetComponent<Rigidbody>().velocity = b_move;
+    }
+
+    [Command]
+    void CmdplayerDies()
+    {
+        alive = false;
+        HP = 0;
+        RpcplayerDies();
+        StartCoroutine("Respawn");
+    }
+
+    [ClientRpc]
+    void RpcplayerDies()
+    {
+        //죽는 소리 및 애니메이션
+    }
+
+    IEnumerator Respawn()
+    {
+        yield return new WaitForSeconds(Respawn_Time);
+
+        if(isServer)
+        {
+            HP = 100;
+            alive = true;
+            RpcRespawn();
+        }
+    }
+
+    [ClientRpc] //모든 클라이언트에서 서버의 명령을 받고 해당 플레이어를 부활로 처리
+    void RpcRespawn()
+    {
+        //부활 및 좌표 변경
     }
 }
