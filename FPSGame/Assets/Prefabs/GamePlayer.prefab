@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8786625802102756818}
   - component: {fileID: 374856956183048096}
   - component: {fileID: 6224472154917574007}
+  - component: {fileID: 1602054438454678596}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -26,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 381010989036865421}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: -0.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -92,6 +93,21 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 381010989036865421}
   m_Enabled: 1
+--- !u!114 &1602054438454678596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 381010989036865421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0727124136b5ab84d985a86cf25e65d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MouseSen: 40
+  MouseX: 0
+  MouseY: 0
 --- !u!1 &3327659006907044414
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,6 +300,10 @@ MonoBehaviour:
   wasd: 0
   jumpPower: 3
   lim_Speed: 12
+  Respawn_Time: 0
+  MouseSen: 40
+  MouseX: 0
+  MouseY: 0
   HP: 0
   Attack_point: {fileID: 6049717106398564246}
   player: {fileID: 3917848278614487696}

@@ -24,6 +24,10 @@ public class Player_Control : NetworkBehaviour
     public float jumpPower; //점프력
     public float lim_Speed; //최대 속력
     public float Respawn_Time;    //리스폰 시간
+    public float MouseSen = 40f;
+
+    public float MouseX;
+    public float MouseY;    //마우스에 따른 몸의 움직임
 
     [SyncVar]
     public int HP;  //플레이어의 체력
@@ -45,7 +49,9 @@ public class Player_Control : NetworkBehaviour
         if (HP <= 0)
         {
             CmdplayerDies();
-        }            
+        }
+
+        if (alive) Rotate();
     }
 
     private void getStart()
@@ -188,5 +194,16 @@ public class Player_Control : NetworkBehaviour
     void RpcRespawn()
     {
         //부활 및 좌표 변경
+    }
+
+    private void Rotate()   //이렇게 하게되면 마우스에 따라 플레이어가 각도를 틀지만, 조금 더 자연스러운 움직임을 위해 머리 몸통을 나눠서 움직여야 할 듯?
+    {
+        MouseX += Input.GetAxisRaw("Mouse X") * MouseSen * Time.deltaTime;
+
+        MouseY += Input.GetAxisRaw("Mouse Y") * MouseSen * Time.deltaTime;
+
+        MouseY = Mathf.Clamp(MouseY, -75f, 75f);    //위 아래 고개 최대 범위 -75 ~ 75
+
+        transform.localRotation = Quaternion.Euler(MouseX, MouseY, 0f);
     }
 }
