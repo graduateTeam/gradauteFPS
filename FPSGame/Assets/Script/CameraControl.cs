@@ -1,10 +1,11 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraControl : MonoBehaviour
 {
-    public float MouseSen = 40f;
+    public float MouseSen = 1500f;
 
     public float MouseX;
     public float MouseY;
@@ -22,6 +23,6 @@ public class CameraControl : MonoBehaviour
 
         MouseY = Mathf.Clamp(MouseY, -75f, 75f);    //위 아래 고개 최대 범위 -75 ~ 75
 
-        transform.localRotation = Quaternion.Euler(MouseX, MouseY, 0f);
+        transform.localRotation = Quaternion.Euler(MouseY, -MouseX, 0f);
     }
 }

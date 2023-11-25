@@ -35,6 +35,8 @@ public class Bullet_Pool : MonoBehaviour
 
             // 총알 풀에 새 총알을 추가
             bulletPool.Add(bullet);
+
+            Debug.Log("총알 확인: " + bulletPool[0] + " // 50번 째: " + bulletPool[49]);
         }
     }
 

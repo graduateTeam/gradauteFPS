@@ -14,17 +14,13 @@ using Unity.VisualScripting;
 */
 
 /*리스폰 코루틴 부분 살짝 불안 나중에 주의깊게 쳐다볼 것*/
+/*서버적 처리를 위해서는 Network Identity를 필수적으로 인스펙터 창에서 할당해 줘야한다*/
 public class Player_Control : NetworkBehaviour
 {
     // Start is called before the first frame update
-    public float speed; //플레이어의 속도
     public bool alive; //플레이어의 생존 여부 이게 꺼져있으면 플레이어의 조작권한을 뺏어오고, 리스폰 후에 다시 부여해줄 것임
     public bool isJump; //무한 점프 방지용 점프를 하고 난 뒤 땅에 착지해야 다시 false로 만들어줄거임
     public bool wasd; //점프 시 wasd 막기
-    public float jumpPower; //점프력
-    public float lim_Speed; //최대 속력
-    public float Respawn_Time;    //리스폰 시간
-    public float MouseSen = 40f;
 
     public float MouseX;
     public float MouseY;    //마우스에 따른 몸의 움직임
@@ -32,14 +28,26 @@ public class Player_Control : NetworkBehaviour
     [SyncVar]
     public int HP;  //플레이어의 체력
 
-    public GameObject Attack_point; //혹시 피격을 위한 오브젝트
-    public Rigidbody player;   //플레이어 몸뚱아리
-    public Rigidbody weapon;   //무기
+    [SyncVar]
+    public float lim_Speed; //최대 속력
 
-    void Start()
-    {
-        getStart();
-    }
+    [SyncVar]
+    public float jumpPower; //점프력
+
+    [SyncVar]
+    public float speed; //플레이어의 속도
+
+    [SyncVar]
+    public float MouseSen;
+
+    [SyncVar]
+    public float Respawn_Time;    //리스폰 시간
+
+    public GameObject Attack_point; //혹시 피격을 위한 오브젝트
+    
+    public Rigidbody rb_player; //플레이어의 리지드바디
+
+    public Rigidbody rb_weapon; //무기의 리지드바디
 
     // Update is called once per frame
     void Update()
@@ -51,21 +59,9 @@ public class Player_Control : NetworkBehaviour
             CmdplayerDies();
         }
 
-        if (alive) Rotate();
+        // if (alive) Rotate();
     }
 
-    private void getStart()
-    {
-        alive = true;
-        isJump = false;
-        wasd = true;
-
-        HP = 100;
-
-        player = GetComponent<Rigidbody>();
-        weapon = GetComponent<Rigidbody>();
-        Attack_point = GetComponent<GameObject>();
-    }
     private void player_movement()
     {
         if (!isLocalPlayer) return;
@@ -80,8 +76,12 @@ public class Player_Control : NetworkBehaviour
                 float Vertical_move = Input.GetAxis("Vertical");
 
                 vec = new Vector3(Horizontal_move, 0, Vertical_move) * speed * Time.deltaTime;
+                Debug.Log("움직임 중"+vec+" // wasd: "+wasd + " // isJump: " + isJump);
                 // 입력을 서버에 전송
-                CmdMoveOnServer(vec);
+                if (isLocalPlayer && NetworkClient.ready)
+                {
+                    CmdMoveOnServer(vec);
+                }
 
             }
 
@@ -90,15 +90,23 @@ public class Player_Control : NetworkBehaviour
                 isJump = true; //2중 점프 막기
                 wasd = false;   //점프 중 움직임 막기
 
-                vec = new Vector3(player.velocity.x, jumpPower, player.velocity.z);
+                vec = new Vector3(0, jumpPower, 0);
+                Debug.Log("점프점프"+vec+" // wasd: "+wasd+" // isJump: "+isJump);
                 // 입력을 서버에 전송
-                CmdMoveOnServer(vec);
-
+                if (isLocalPlayer && NetworkClient.ready)
+                {
+                    CmdJumpOnServer(vec);
+                }
             }
 
             if (Input.GetButtonDown("Fire1"))
             {
-                CmdFire();
+                Debug.Log("총알 발사");
+                if (isLocalPlayer && NetworkClient.ready)
+                {
+                    CmdFire();
+                }
+                
             }
 
         }
@@ -110,9 +118,23 @@ public class Player_Control : NetworkBehaviour
         {
             if (collision.gameObject.tag == "land")
             {
+                Debug.Log("땅에 착지함");
                 isJump = false;
                 wasd = true;
             }
+        }
+    }
+
+    public override void OnStartServer()
+    {
+        CmdSpawnPlayers();
+    }
+
+    public override void OnStartClient()
+    {
+        if (isLocalPlayer && !NetworkClient.ready)
+        {
+            NetworkClient.Ready();
         }
     }
 
@@ -120,7 +142,18 @@ public class Player_Control : NetworkBehaviour
     [Command]
     void CmdMoveOnServer(Vector3 move)
     {
-        if (player.velocity.magnitude < lim_Speed) player.velocity = move;
+        rb_player.AddForce(move, ForceMode.Impulse);
+        rb_player.velocity = Vector3.ClampMagnitude(rb_player.velocity, lim_Speed);
+
+        rb_weapon.AddForce(rb_player.velocity, ForceMode.Impulse);
+    }
+
+    [Command]
+    void CmdJumpOnServer(Vector3 jump)
+    {
+        rb_player.AddForce(jump, ForceMode.VelocityChange);
+
+        rb_weapon.AddForce(rb_player.velocity, ForceMode.VelocityChange);
     }
 
     public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수
@@ -137,7 +170,7 @@ public class Player_Control : NetworkBehaviour
     [Command]   //Command가 있으면 클라이언트에서 호출하지만 처리는 서버(Mirror)에서 함
     void CmdFire()  //총알 발사 서버에서의 처리
     {
-        GameObject bullet = Bullet_Pool.instance.GetBullet();
+        GameObject bullet = Bullet_Pool.instance.GetBullet();   //bullet이 Null인 건 일단 제쳐두고
 
         if (bullet != null)
         {
@@ -145,8 +178,8 @@ public class Player_Control : NetworkBehaviour
             bullet.transform.localPosition = Vector3.zero;
             bullet.transform.localRotation = Quaternion.identity;
 
-            bullet.transform.localPosition = weapon.transform.forward;
-            bullet.transform.localRotation = weapon.rotation;
+            bullet.transform.localPosition = rb_weapon.transform.forward;
+            bullet.transform.localRotation = rb_weapon.rotation;
 
             //총알을 네트워크에서 생성
             NetworkServer.Spawn(bullet);
@@ -166,6 +199,7 @@ public class Player_Control : NetworkBehaviour
     [Command]
     void CmdplayerDies()
     {
+        Debug.Log("지금 죽었다고 보는거냐?");
         alive = false;
         HP = 0;
         RpcplayerDies();
@@ -204,6 +238,42 @@ public class Player_Control : NetworkBehaviour
 
         MouseY = Mathf.Clamp(MouseY, -75f, 75f);    //위 아래 고개 최대 범위 -75 ~ 75
 
-        transform.localRotation = Quaternion.Euler(MouseX, MouseY, 0f);
+        transform.localRotation = Quaternion.Euler(MouseY, -MouseX, 0f);
+    }//큐브모형의 오브젝트가 구르는 문제가 있어서 임시 폐지
+
+    [Command]
+    private void CmdSpawnPlayers()  //서버적으로 각종 플레이어 수치들이 할당되어야 한다.
+    {
+        Vector3 Spawn_Point = new Vector3(0, 20, 0);
+        Attack_point.transform.position = Spawn_Point;
+        Attack_point.transform.Translate(0, 0, 0);
+
+        NetworkServer.Spawn(Attack_point); //맨 위의 어택 포인트(부모)만 소환해야 분신이 안 생긴다.
+
+        RpcSetPlayer(Attack_point);
     }
+
+    [ClientRpc]
+    private void RpcSetPlayer(GameObject Attack_Object)
+    {
+        rb_player = Attack_Object.GetComponent<Rigidbody>();
+        rb_weapon = Attack_Object.GetComponent<Rigidbody>();
+
+        if (rb_player == null)
+        {
+            Debug.Log("rb_player is null");
+        }
+
+        if (rb_weapon == null)
+        {
+            Debug.Log("rb_weapon is null");
+        }
+
+        alive = true;
+        isJump = false;
+        wasd = true;
+
+        HP = 100;
+    }
+
 }
