@@ -21,8 +21,10 @@ public class CameraControl : MonoBehaviour
 
         MouseY += Input.GetAxisRaw("Mouse Y") * MouseSen * Time.deltaTime;
 
-        MouseY = Mathf.Clamp(MouseY, -75f, 75f);    //위 아래 고개 최대 범위 -75 ~ 75
+        MouseY = Mathf.Clamp(MouseY, -90f, 90f);    //위 아래 고개 최대 범위 -75 ~ 75
 
-        transform.localRotation = Quaternion.Euler(MouseY, -MouseX, 0f);
+        Quaternion quat = Quaternion.Euler(new Vector3(MouseY, -MouseX, 0));
+        transform.rotation
+            = Quaternion.Slerp(transform.rotation, quat, Time.fixedDeltaTime * MouseSen);
     }
 }

@@ -239,7 +239,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0727124136b5ab84d985a86cf25e65d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MouseSen: 300
+  MouseSen: 500
   MouseX: 0
   MouseY: 0
 --- !u!114 &4486500447967067744
@@ -447,7 +447,7 @@ MonoBehaviour:
   lim_Speed: 15
   jumpPower: 5
   speed: 8
-  MouseSen: 300
+  MouseSen: 500
   Respawn_Time: 5
   Attack_point: {fileID: 4367170199980874936}
   rb_player: {fileID: 8853687017734318960}

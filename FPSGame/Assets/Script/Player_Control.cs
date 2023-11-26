@@ -5,6 +5,7 @@ using Mirror;
 using System;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
+using UnityEngine.UIElements;
 /*
 * 게임 방에 들어갈 플레이어의 프리팹으로
 * 이 곳에 플레이어의 움직임, HP등을 관리한다면
@@ -59,7 +60,7 @@ public class Player_Control : NetworkBehaviour
             CmdplayerDies();
         }
 
-        // if (alive) Rotate();
+        Rotate();
     }
 
     private void player_movement()
@@ -104,7 +105,7 @@ public class Player_Control : NetworkBehaviour
                 Debug.Log("총알 발사");
                 if (isLocalPlayer && NetworkClient.ready)
                 {
-                    CmdFire();
+                    //CmdFire();
                 }
                 
             }
@@ -144,16 +145,18 @@ public class Player_Control : NetworkBehaviour
     {
         rb_player.AddForce(move, ForceMode.Impulse);
         rb_player.velocity = Vector3.ClampMagnitude(rb_player.velocity, lim_Speed);
-
-        rb_weapon.AddForce(rb_player.velocity, ForceMode.Impulse);
     }
 
     [Command]
     void CmdJumpOnServer(Vector3 jump)
     {
         rb_player.AddForce(jump, ForceMode.VelocityChange);
+    }
 
-        rb_weapon.AddForce(rb_player.velocity, ForceMode.VelocityChange);
+    [Command]
+    void CmdRotateOnServer(Vector3 rotate)
+    {
+        transform.rotation = Quaternion.Euler(rotate);
     }
 
     public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수
@@ -187,6 +190,10 @@ public class Player_Control : NetworkBehaviour
             //총알 속도
             Vector3 b_vec = bullet.transform.localPosition * 350;  //임의로 350으로
             CmdBulletMoveOnServer(b_vec, bullet);
+        }
+        else
+        {
+            Debug.Log("총알 준비 안 됨");
         }
     }
 
@@ -232,13 +239,18 @@ public class Player_Control : NetworkBehaviour
 
     private void Rotate()   //이렇게 하게되면 마우스에 따라 플레이어가 각도를 틀지만, 조금 더 자연스러운 움직임을 위해 머리 몸통을 나눠서 움직여야 할 듯?
     {
-        MouseX += Input.GetAxisRaw("Mouse X") * MouseSen * Time.deltaTime;
+        if(alive)
+        {
+            MouseX += Input.GetAxisRaw("Mouse X") * MouseSen * Time.deltaTime;
 
-        MouseY += Input.GetAxisRaw("Mouse Y") * MouseSen * Time.deltaTime;
+            MouseY += Input.GetAxisRaw("Mouse Y") * MouseSen * Time.deltaTime;
 
-        MouseY = Mathf.Clamp(MouseY, -75f, 75f);    //위 아래 고개 최대 범위 -75 ~ 75
+            MouseY = Mathf.Clamp(MouseY, -90f, 90f);    //위 아래 고개 최대 범위 -75 ~ 75
 
-        transform.localRotation = Quaternion.Euler(MouseY, -MouseX, 0f);
+            Quaternion quat = Quaternion.Euler(new Vector3(MouseY, -MouseX, 0));
+            transform.rotation
+                = Quaternion.Slerp(transform.rotation, quat, Time.fixedDeltaTime *MouseSen);
+        }
     }//큐브모형의 오브젝트가 구르는 문제가 있어서 임시 폐지
 
     [Command]
@@ -247,6 +259,7 @@ public class Player_Control : NetworkBehaviour
         Vector3 Spawn_Point = new Vector3(0, 20, 0);
         Attack_point.transform.position = Spawn_Point;
         Attack_point.transform.Translate(0, 0, 0);
+        Attack_point.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
         NetworkServer.Spawn(Attack_point); //맨 위의 어택 포인트(부모)만 소환해야 분신이 안 생긴다.
 
@@ -275,5 +288,4 @@ public class Player_Control : NetworkBehaviour
 
         HP = 100;
     }
-
 }
