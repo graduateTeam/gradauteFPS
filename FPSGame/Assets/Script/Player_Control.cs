@@ -76,7 +76,7 @@ public class Player_Control : NetworkBehaviour
                 float Horizontal_move = Input.GetAxis("Horizontal");
                 float Vertical_move = Input.GetAxis("Vertical");
 
-                vec = new Vector3(Horizontal_move, 0, Vertical_move) * speed * Time.deltaTime;
+                vec = transform.TransformDirection(new Vector3(Horizontal_move, 0, Vertical_move)) * speed * Time.deltaTime;
                 Debug.Log("움직임 중"+vec+" // wasd: "+wasd + " // isJump: " + isJump);
                 // 입력을 서버에 전송
                 if (isLocalPlayer && NetworkClient.ready)
@@ -91,7 +91,7 @@ public class Player_Control : NetworkBehaviour
                 isJump = true; //2중 점프 막기
                 wasd = false;   //점프 중 움직임 막기
 
-                vec = new Vector3(0, jumpPower, 0);
+                vec = transform.TransformDirection(new Vector3(0, jumpPower, 0)) * speed * Time.deltaTime;
                 Debug.Log("점프점프"+vec+" // wasd: "+wasd+" // isJump: "+isJump);
                 // 입력을 서버에 전송
                 if (isLocalPlayer && NetworkClient.ready)
