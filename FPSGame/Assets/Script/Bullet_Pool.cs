@@ -95,4 +95,8 @@ public class Bullet_Pool : NetworkBehaviour
         return (int)(damage * Math.Round((float)((100 - dis) / 100), 2)); //임의의 계산 제대로 몸의 중심으로부터 거리에 따른 대미지 경감이 들어갈지 미지수
     }
 
+    public void MoveBullet(Vector3 vec)
+    {
+        bulletPrefab.GetComponent<Rigidbody>().AddForce(vec);
+    }
 }

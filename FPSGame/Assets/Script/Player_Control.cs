@@ -50,8 +50,10 @@ public class Player_Control : NetworkBehaviour
 
     public Rigidbody rb_weapon; //무기의 리지드바디
 
+    public Bullet_Pool bullet_Class;
+
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         player_movement();
 
@@ -77,11 +79,11 @@ public class Player_Control : NetworkBehaviour
                 float Vertical_move = Input.GetAxis("Vertical");
 
                 vec = transform.TransformDirection(new Vector3(Horizontal_move, 0, Vertical_move)) * speed * Time.deltaTime;
-                Debug.Log("움직임 중"+vec+" // wasd: "+wasd + " // isJump: " + isJump);
-                // 입력을 서버에 전송
-                if (isLocalPlayer && NetworkClient.ready)
+                Debug.Log("움직임");
+                if (hasAuthority)
                 {
-                    CmdMoveOnServer(vec);
+                    rb_player.AddForce(vec, ForceMode.Impulse);
+                    rb_player.velocity = Vector3.ClampMagnitude(rb_player.velocity, lim_Speed);
                 }
 
             }
@@ -92,11 +94,10 @@ public class Player_Control : NetworkBehaviour
                 wasd = false;   //점프 중 움직임 막기
 
                 vec = transform.TransformDirection(new Vector3(0, jumpPower, 0)) * speed * Time.deltaTime;
-                Debug.Log("점프점프"+vec+" // wasd: "+wasd+" // isJump: "+isJump);
-                // 입력을 서버에 전송
-                if (isLocalPlayer && NetworkClient.ready)
+                Debug.Log("점프");
+                if (hasAuthority)
                 {
-                    CmdJumpOnServer(vec);
+                    rb_player.AddForce(vec, ForceMode.Impulse);
                 }
             }
 
@@ -109,7 +110,7 @@ public class Player_Control : NetworkBehaviour
                 }
                 
             }
-
+            Debug.Log("wasd: " + wasd + " // isJump: " + isJump);
         }
     }
 
@@ -128,7 +129,7 @@ public class Player_Control : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        CmdSpawnPlayers();
+        SpawnPlayer();
     }
 
     public override void OnStartClient()
@@ -137,26 +138,6 @@ public class Player_Control : NetworkBehaviour
         {
             NetworkClient.Ready();
         }
-    }
-
-    //서버에 전송에 움직임과 체력감소를 하기 위한 코드
-    [Command]
-    void CmdMoveOnServer(Vector3 move)
-    {
-        rb_player.AddForce(move, ForceMode.Impulse);
-        rb_player.velocity = Vector3.ClampMagnitude(rb_player.velocity, lim_Speed);
-    }
-
-    [Command]
-    void CmdJumpOnServer(Vector3 jump)
-    {
-        rb_player.AddForce(jump, ForceMode.VelocityChange);
-    }
-
-    [Command]
-    void CmdRotateOnServer(Vector3 rotate)
-    {
-        transform.rotation = Quaternion.Euler(rotate);
     }
 
     public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수
@@ -189,18 +170,13 @@ public class Player_Control : NetworkBehaviour
 
             //총알 속도
             Vector3 b_vec = bullet.transform.localPosition * 350;  //임의로 350으로
-            CmdBulletMoveOnServer(b_vec, bullet);
+            bullet_Class.MoveBullet(b_vec);
+            
         }
         else
         {
             Debug.Log("총알 준비 안 됨");
         }
-    }
-
-    [Command]
-    void CmdBulletMoveOnServer(Vector3 b_move, GameObject bullet)
-    {
-        bullet.GetComponent<Rigidbody>().velocity = b_move;
     }
 
     [Command]
@@ -253,8 +229,8 @@ public class Player_Control : NetworkBehaviour
         }
     }//큐브모형의 오브젝트가 구르는 문제가 있어서 임시 폐지
 
-    [Command]
-    private void CmdSpawnPlayers()  //서버적으로 각종 플레이어 수치들이 할당되어야 한다.
+    [Server]
+    private void SpawnPlayer()  //서버적으로 각종 플레이어 수치들이 할당되어야 한다.
     {
         Vector3 Spawn_Point = new Vector3(0, 20, 0);
         Attack_point.transform.position = Spawn_Point;
@@ -263,11 +239,10 @@ public class Player_Control : NetworkBehaviour
 
         NetworkServer.Spawn(Attack_point); //맨 위의 어택 포인트(부모)만 소환해야 분신이 안 생긴다.
 
-        RpcSetPlayer(Attack_point);
+        Game_Start(Attack_point);
     }
 
-    [ClientRpc]
-    private void RpcSetPlayer(GameObject Attack_Object)
+    private void Game_Start(GameObject Attack_Object)
     {
         rb_player = Attack_Object.GetComponent<Rigidbody>();
         rb_weapon = Attack_Object.GetComponent<Rigidbody>();
@@ -282,10 +257,6 @@ public class Player_Control : NetworkBehaviour
             Debug.Log("rb_weapon is null");
         }
 
-        alive = true;
-        isJump = false;
-        wasd = true;
-
-        HP = 100;
+        bullet_Class = new Bullet_Pool();
     }
 }
