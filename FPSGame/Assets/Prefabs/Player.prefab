@@ -167,7 +167,7 @@ MonoBehaviour:
   Attack_point: {fileID: 1694475315678981098}
   rb_player: {fileID: 4784240305978912532}
   rb_weapon: {fileID: 5266273522526468471}
-  bullet_Class: {fileID: 0}
+  bc: {fileID: 6011571918895888910, guid: e7bb071102ef2424fabf52071da11e1f, type: 3}
 --- !u!114 &3775659296248186673
 MonoBehaviour:
   m_ObjectHideFlags: 0

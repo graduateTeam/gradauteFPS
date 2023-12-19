@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using System.ComponentModel;
 using System;
+using System.Security.Cryptography;
 
 /*총의 오브젝트 풀이 생성되지 않는 것이 문제*/
 public class Bullet_Pool : NetworkBehaviour
@@ -15,20 +16,21 @@ public class Bullet_Pool : NetworkBehaviour
     // 풀의 크기 (미리 생성할 총알 수)
     public int poolSize = 100;
     // Bullet_Pool 클래스의 인스턴스를 저장하는 정적 변수
-    public static Bullet_Pool _instance;
-    public static Bullet_Pool instance
-    {
-        get
-        {
-            if(_instance == null)
-            {
-                _instance = FindObjectOfType<Bullet_Pool>();
-            }
+    public static Bullet_Pool bp_instance; //싱글톤 방식으로 오브젝트 공유
 
-            return _instance;
+    void Awake()
+    {
+        if (bp_instance == null)
+        {
+            bp_instance = this;
+        }
+        else
+        {
+            Debug.LogWarning("bp_Instance already exists, destroying object!");
+            Destroy(this);
         }
     }
-
+       
     private Queue<GameObject> bulletPool;
 
     public override void OnStartServer()
@@ -58,6 +60,8 @@ public class Bullet_Pool : NetworkBehaviour
     {
         // 총알을 비활성화
         bullet.SetActive(false);
+        bulletPool.Enqueue(bullet);
+        Debug.Log("총알 재 충전 및 파괴"+bulletPool.Count);
     }
 
     private void pool_spawn()
@@ -71,32 +75,5 @@ public class Bullet_Pool : NetworkBehaviour
             bullet.SetActive(false); // 총알을 비활성화
             bulletPool.Enqueue(bullet);
         }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        Player_Control player = collision.gameObject.GetComponent<Player_Control>();
-
-        if (player != null)
-        {
-            Vector3 player_pos = player.Attack_point.transform.position;  //플레이어가 서 있는 위치
-            Vector3 bullet_pos = bulletPrefab.transform.position;
-
-            player.Hitted_Bullet(damage_Reducing(player_pos, bullet_pos, 10));   //임의로 대미지 10이라고 한 것 스크립트에 대미지가 정해지면 그 대미지로 바꿀 것
-        }
-
-        ReturnBullet(bulletPrefab);
-    }
-
-    int damage_Reducing(Vector3 player_pos, Vector3 bullet_pos, int damage)
-    {
-        float dis = Vector3.Magnitude(bullet_pos - player_pos);
-
-        return (int)(damage * Math.Round((float)((100 - dis) / 100), 2)); //임의의 계산 제대로 몸의 중심으로부터 거리에 따른 대미지 경감이 들어갈지 미지수
-    }
-
-    public void MoveBullet(Vector3 vec)
-    {
-        bulletPrefab.GetComponent<Rigidbody>().AddForce(vec);
     }
 }

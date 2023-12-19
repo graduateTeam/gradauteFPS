@@ -50,7 +50,10 @@ public class Player_Control : NetworkBehaviour
 
     public Rigidbody rb_weapon; //무기의 리지드바디
 
-    public Bullet_Pool bullet_Class;
+    public Bullet_Control bc;
+
+    [SyncVar]
+    public bool canFire = true;
 
     // Update is called once per frame
     void FixedUpdate()
@@ -80,7 +83,7 @@ public class Player_Control : NetworkBehaviour
 
                 vec = transform.TransformDirection(new Vector3(Horizontal_move, 0, Vertical_move)) * speed * Time.deltaTime;
                 Debug.Log("움직임");
-                if (hasAuthority)
+                if (isOwned)
                 {
                     rb_player.AddForce(vec, ForceMode.Impulse);
                     rb_player.velocity = Vector3.ClampMagnitude(rb_player.velocity, lim_Speed);
@@ -95,18 +98,17 @@ public class Player_Control : NetworkBehaviour
 
                 vec = transform.TransformDirection(new Vector3(0, jumpPower, 0)) * speed * Time.deltaTime;
                 Debug.Log("점프");
-                if (hasAuthority)
+                if (isOwned)
                 {
                     rb_player.AddForce(vec, ForceMode.Impulse);
                 }
             }
 
-            if (Input.GetButtonDown("Fire1"))
+            if (Input.GetButton("Fire1"))
             {
-                Debug.Log("총알 발사");
-                if (isLocalPlayer && NetworkClient.ready)
+                if (isLocalPlayer && NetworkClient.ready && canFire)
                 {
-                    //CmdFire();
+                    CmdFire();
                 }
                 
             }
@@ -120,7 +122,6 @@ public class Player_Control : NetworkBehaviour
         {
             if (collision.gameObject.tag == "land")
             {
-                Debug.Log("땅에 착지함");
                 isJump = false;
                 wasd = true;
             }
@@ -154,35 +155,19 @@ public class Player_Control : NetworkBehaviour
     [Command]   //Command가 있으면 클라이언트에서 호출하지만 처리는 서버(Mirror)에서 함
     void CmdFire()  //총알 발사 서버에서의 처리
     {
-        GameObject bullet = Bullet_Pool.instance.GetBullet();   //bullet이 Null인 건 일단 제쳐두고
-
-        if (bullet != null)
+        try
         {
-            //총알의 위치 및 방향 설정
-            bullet.transform.localPosition = Vector3.zero;
-            bullet.transform.localRotation = Quaternion.identity;
-
-            bullet.transform.localPosition = rb_weapon.transform.forward;
-            bullet.transform.localRotation = rb_weapon.rotation;
-
-            //총알을 네트워크에서 생성
-            NetworkServer.Spawn(bullet);
-
-            //총알 속도
-            Vector3 b_vec = bullet.transform.localPosition * 350;  //임의로 350으로
-            bullet_Class.MoveBullet(b_vec);
-            
+            StartCoroutine("Weapon_delay");
         }
-        else
+        catch(Exception e)
         {
-            Debug.Log("총알 준비 안 됨");
+            Debug.LogError(e);
         }
     }
 
     [Command]
     void CmdplayerDies()
     {
-        Debug.Log("지금 죽었다고 보는거냐?");
         alive = false;
         HP = 0;
         RpcplayerDies();
@@ -207,6 +192,15 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
+    IEnumerator Weapon_delay()
+    {
+        canFire = false;
+        bc.Bullet_Shoot(rb_weapon);
+
+        yield return new WaitForSeconds(0.2f);  //임의값
+        canFire = true;
+    }
+
     [ClientRpc] //모든 클라이언트에서 서버의 명령을 받고 해당 플레이어를 부활로 처리
     void RpcRespawn()
     {
@@ -227,7 +221,7 @@ public class Player_Control : NetworkBehaviour
             transform.rotation
                 = Quaternion.Slerp(transform.rotation, quat, Time.fixedDeltaTime *MouseSen);
         }
-    }//큐브모형의 오브젝트가 구르는 문제가 있어서 임시 폐지
+    }
 
     [Server]
     private void SpawnPlayer()  //서버적으로 각종 플레이어 수치들이 할당되어야 한다.
@@ -257,6 +251,6 @@ public class Player_Control : NetworkBehaviour
             Debug.Log("rb_weapon is null");
         }
 
-        bullet_Class = new Bullet_Pool();
+        bc = Bullet_Control.bc_instance;    //NetworkBehavior를 상속받게 된다면 통상 new ~~ 이런 식의 인스턴스화는 불가능하게 된다.
     }
 }
