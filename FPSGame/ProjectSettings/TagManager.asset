@@ -6,6 +6,7 @@ TagManager:
   tags:
   - land
   - bullet
+  - Weapon
   layers:
   - Default
   - TransparentFX

@@ -61,7 +61,6 @@ public class Bullet_Pool : NetworkBehaviour
         // 총알을 비활성화
         bullet.SetActive(false);
         bulletPool.Enqueue(bullet);
-        Debug.Log("총알 재 충전 및 파괴"+bulletPool.Count);
     }
 
     private void pool_spawn()

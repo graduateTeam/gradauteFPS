@@ -168,6 +168,8 @@ MonoBehaviour:
   rb_player: {fileID: 4784240305978912532}
   rb_weapon: {fileID: 5266273522526468471}
   bc: {fileID: 6011571918895888910, guid: e7bb071102ef2424fabf52071da11e1f, type: 3}
+  gm: {fileID: 0}
+  canFire: 1
 --- !u!114 &3775659296248186673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,7 +237,7 @@ GameObject:
   - component: {fileID: 8709032270354986824}
   m_Layer: 7
   m_Name: Weapon
-  m_TagString: Player
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -367,7 +369,7 @@ GameObject:
   - component: {fileID: 7528181599542744159}
   m_Layer: 7
   m_Name: Main Camera
-  m_TagString: Player
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

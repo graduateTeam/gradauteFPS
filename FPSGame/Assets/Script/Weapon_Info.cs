@@ -11,6 +11,7 @@ public class Weapon_Info : MonoBehaviour
     public int Max_Bullet; //ÃÑ¾Ë ÃÑ·®
     public int One_Bullet; //ÇÑ ÅºÃ¢ ÃÑ¾Ë
     public float rebound;   //¹Ýµ¿°è¼ö
+    public string Gun_Name; //ÃÑ ÀÌ¸§
     public float speed; //Åº¼Ó
     public float damage;    //´ë¹ÌÁö
 

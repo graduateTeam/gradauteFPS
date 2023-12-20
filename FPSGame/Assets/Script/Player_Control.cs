@@ -25,6 +25,7 @@ public class Player_Control : NetworkBehaviour
 
     public float MouseX;
     public float MouseY;    //마우스에 따른 몸의 움직임
+    private Vector3 jumpDirection;
 
     [SyncVar]
     public int HP;  //플레이어의 체력
@@ -51,6 +52,7 @@ public class Player_Control : NetworkBehaviour
     public Rigidbody rb_weapon; //무기의 리지드바디
 
     public Bullet_Control bc;
+    public GameManager gm;
 
     [SyncVar]
     public bool canFire = true;
@@ -68,6 +70,11 @@ public class Player_Control : NetworkBehaviour
         Rotate();
     }
 
+    private void Update()
+    {
+        gm.HP_UI_Update(HP);
+    }
+
     private void player_movement()
     {
         if (!isLocalPlayer) return;
@@ -81,8 +88,11 @@ public class Player_Control : NetworkBehaviour
                 float Horizontal_move = Input.GetAxis("Horizontal");
                 float Vertical_move = Input.GetAxis("Vertical");
 
-                vec = transform.TransformDirection(new Vector3(Horizontal_move, 0, Vertical_move)) * speed * Time.deltaTime;
-                Debug.Log("움직임");
+                jumpDirection = new Vector3(Horizontal_move, 0, Vertical_move);
+
+                vec = transform.TransformDirection(jumpDirection) * speed * Time.deltaTime;
+
+                jumpDirection = vec;
                 if (isOwned)
                 {
                     rb_player.AddForce(vec, ForceMode.Impulse);
@@ -91,12 +101,12 @@ public class Player_Control : NetworkBehaviour
 
             }
 
-            if (!isJump && Input.GetButtonDown("Jump"))
+            if (!isJump && Input.GetButton("Jump"))
             {
                 isJump = true; //2중 점프 막기
                 wasd = false;   //점프 중 움직임 막기
 
-                vec = transform.TransformDirection(new Vector3(0, jumpPower, 0)) * speed * Time.deltaTime;
+                vec = transform.TransformDirection(new Vector3(jumpDirection.x, jumpPower, jumpDirection.z)) * speed * Time.deltaTime;
                 Debug.Log("점프");
                 if (isOwned)
                 {
@@ -111,19 +121,6 @@ public class Player_Control : NetworkBehaviour
                     CmdFire();
                 }
                 
-            }
-            Debug.Log("wasd: " + wasd + " // isJump: " + isJump);
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (alive)   //땅 혹은 지형지물에 다시 닿으면 점프 다시 활성화
-        {
-            if (collision.gameObject.tag == "land")
-            {
-                isJump = false;
-                wasd = true;
             }
         }
     }
@@ -141,6 +138,7 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
+    [ClientRpc]
     public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수
     {
         CmdReduceHP(damage);
@@ -182,9 +180,18 @@ public class Player_Control : NetworkBehaviour
 
     IEnumerator Respawn()
     {
-        yield return new WaitForSeconds(Respawn_Time);
+        float startTime = Time.time;
+        float elapsedTime = 0;
 
-        if(isServer)
+        while (elapsedTime < Respawn_Time)
+        {
+            elapsedTime = Time.time - startTime;
+            gm.Respawn_bar_Update(elapsedTime, Respawn_Time);
+
+            yield return null;  // 다음 프레임까지 대기합니다.
+        }
+
+        if (isServer)
         {
             HP = 100;
             alive = true;
@@ -252,5 +259,40 @@ public class Player_Control : NetworkBehaviour
         }
 
         bc = Bullet_Control.bc_instance;    //NetworkBehavior를 상속받게 된다면 통상 new ~~ 이런 식의 인스턴스화는 불가능하게 된다.
+
+        gm = GameManager.gm_instance;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (alive)   //땅 혹은 지형지물에 다시 닿으면 점프 다시 활성화
+        {
+            if (collision.gameObject.tag == "land")
+            {
+                isJump = false;
+                wasd = true;
+
+                //rb_player.velocity = new Vector3(jumpDirection.x, 0, jumpDirection.z);
+            }
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "bullet")
+        {
+            Debug.Log("플레이어의 피격");
+            Vector3 player_pos = transform.position;  //플레이어가 서 있는 위치
+            Vector3 bullet_pos = other.transform.position;
+
+            Hitted_Bullet(damage_Reducing(player_pos, bullet_pos, 10));   //임의로 대미지 10이라고 한 것 스크립트에 대미지가 정해지면 그 대미지로 바꿀 것
+        }
+    }
+
+    int damage_Reducing(Vector3 player_pos, Vector3 bullet_pos, int damage)
+    {
+        float dis = Vector3.Magnitude(bullet_pos - player_pos);
+
+        return (int)(damage * Math.Round((float)((100 - dis) / 100), 2)); //임의의 계산 제대로 몸의 중심으로부터 거리에 따른 대미지 경감이 들어갈지 미지수
     }
 }
