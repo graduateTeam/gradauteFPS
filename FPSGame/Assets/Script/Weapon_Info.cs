@@ -10,7 +10,11 @@ public class Weapon_Info : MonoBehaviour
     public float delay;    //딜레이
     public int Max_Bullet; //총알 총량
     public int One_Bullet; //한 탄창 총알
-    public float rebound;   //반동계수
+
+    public float recoilAmount = 1.0f; // 반동의 양
+    public float recoilRecoverySpeed = 3.0f; // 반동 회복 속도
+    public float currentRecoil = 0.0f; // 현재 반동 상태
+
     public string Gun_Name; //총 이름
     public float speed; //탄속
     public float damage;    //대미지

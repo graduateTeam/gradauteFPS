@@ -54,6 +54,10 @@ public class Player_Control : NetworkBehaviour
     public Bullet_Control bc;
     public GameManager gm;
 
+    private float recoilAmount = 1.0f; // 반동의 양
+    private float recoilRecoverySpeed = 3.0f; // 반동 회복 속도
+    private float currentRecoil = 0.0f; // 현재 반동 상태 //Weapon_info에서 추후 받아올 것임
+
     [SyncVar]
     public bool canFire = true;
 
@@ -73,6 +77,14 @@ public class Player_Control : NetworkBehaviour
     private void Update()
     {
         gm.HP_UI_Update(HP);
+
+        // 반동을 부드럽게 적용한다.
+        if (currentRecoil > 0 && !canFire)  //시간에 따른다 = 총 발사 후(canFire == currentRecoil이 양수로 더해지는 것)
+        {
+            MouseY -= currentRecoil * Time.deltaTime;   //시간에 따른 반동적용(!canFire인 시간이 길어질 수록 위로 심하게 밀림)
+            currentRecoil -= recoilRecoverySpeed * Time.deltaTime;  //시간에 따른 반동회복(그만큼 회복도 많이 시켜줌)
+            currentRecoil = Mathf.Max(currentRecoil, 0);
+        }
     }
 
     private void player_movement()
@@ -202,6 +214,7 @@ public class Player_Control : NetworkBehaviour
     IEnumerator Weapon_delay()
     {
         canFire = false;
+        currentRecoil += recoilAmount;  //반동을 더해간다.
         bc.Bullet_Shoot(rb_weapon);
 
         yield return new WaitForSeconds(0.2f);  //임의값
