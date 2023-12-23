@@ -1,10 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using System.ComponentModel;
-using System;
-using System.Security.Cryptography;
 
 /*총의 오브젝트 풀이 생성되지 않는 것이 문제*/
 public class Bullet_Pool : NetworkBehaviour

@@ -1,21 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using System;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
-using UnityEngine.UIElements;
+
 /*
-* 게임 방에 들어갈 플레이어의 프리팹으로
-* 이 곳에 플레이어의 움직임, HP등을 관리한다면
-* 서버를 통해 게임을 진행시키는 것과 같고
-* 클라이언트에서 그런 중요정보를 처리하지 않음으로써
-* 메이플의 클라이언트 변조사건 등을 막을 수 있다.
+* 괜히 GameManabger로 분리 시킬 생각하지마라 골치 아파진다.
 */
 
-/*리스폰 코루틴 부분 살짝 불안 나중에 주의깊게 쳐다볼 것*/
-/*서버적 처리를 위해서는 Network Identity를 필수적으로 인스펙터 창에서 할당해 줘야한다*/
 public class Player_Control : NetworkBehaviour
 {
     // Start is called before the first frame update
@@ -84,6 +75,11 @@ public class Player_Control : NetworkBehaviour
             MouseY -= currentRecoil * Time.deltaTime;   //시간에 따른 반동적용(!canFire인 시간이 길어질 수록 위로 심하게 밀림)
             currentRecoil -= recoilRecoverySpeed * Time.deltaTime;  //시간에 따른 반동회복(그만큼 회복도 많이 시켜줌)
             currentRecoil = Mathf.Max(currentRecoil, 0);
+        }
+
+        if(NetworkServer.active)
+        {
+            Time_spent();
         }
     }
 
@@ -159,7 +155,10 @@ public class Player_Control : NetworkBehaviour
     [Command]
     void CmdReduceHP(int damage)
     {
-        HP -= damage;
+        if (HP > damage)
+            HP -= damage;
+        else
+            HP = 0;
     }
 
     [Command]   //Command가 있으면 클라이언트에서 호출하지만 처리는 서버(Mirror)에서 함
@@ -274,6 +273,8 @@ public class Player_Control : NetworkBehaviour
         bc = Bullet_Control.bc_instance;    //NetworkBehavior를 상속받게 된다면 통상 new ~~ 이런 식의 인스턴스화는 불가능하게 된다.
 
         gm = GameManager.gm_instance;
+
+        gm.UI_Init();   //UI 초기화
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -308,4 +309,21 @@ public class Player_Control : NetworkBehaviour
 
         return (int)(damage * Math.Round((float)((100 - dis) / 100), 2)); //임의의 계산 제대로 몸의 중심으로부터 거리에 따른 대미지 경감이 들어갈지 미지수
     }
+
+    [Server]
+    private void Time_spent()   //시간 흐르는 것 관련
+    {
+        float[] t_res = gm.Time_go();
+        Time_Update(t_res[0], t_res[1]);
+    }
+
+    [ClientRpc]
+    public void Time_Update(float m, float s)   //시간 UI Update
+    {
+        string sec = s < 10 ? "0" + s.ToString() : s.ToString();
+        string min = m.ToString() + ":";
+
+        gm.game_Time_UI.text = string.Format(min + sec);
+    }
+
 }

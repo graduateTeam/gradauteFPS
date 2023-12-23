@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 /*
  * 총기와 관련된 정보를 담아놓은 스크립트

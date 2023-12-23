@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -13,6 +11,16 @@ public class GameManager : MonoBehaviour
     public Image Respawn_bar;
 
     public static GameManager gm_instance;
+
+    public TextMeshProUGUI Red_kill_UI;
+    public TextMeshProUGUI Blue_kill_UI;
+    public TextMeshProUGUI game_Time_UI;
+
+    private int Red_kill;
+    private int Blue_kill;
+    private float gameTime;
+    private float minute;
+    private float second;
 
     private void Awake()
     {
@@ -41,4 +49,44 @@ public class GameManager : MonoBehaviour
     {
         Respawn_bar.fillAmount = time / fullTime;   
     }
+
+    public void UI_Init()
+    {
+        gameTime = 300;
+
+        minute = 5;
+        second = 0;
+
+        Red_kill = 0;
+        Blue_kill = 0;
+    }
+
+    public float[] Time_go()    //시간 가기
+    {
+        gameTime -= Time.deltaTime;
+
+        minute = gameTime / 60;
+        second = gameTime % 60;
+
+        minute = Mathf.Floor(minute);
+        second = Mathf.Floor(second);
+
+        return new float[] {minute, second};
+    }
+
+    public int[] Who_kill(string team) //누군가 죽이면 킬 수 올리기
+    {
+        if(team.Equals("red"))
+        {
+            Red_kill += 1;
+        }
+        else
+        {
+            Blue_kill += 1;
+        }
+
+        return new int[] {Red_kill, Blue_kill};
+    }
+
+
 }
