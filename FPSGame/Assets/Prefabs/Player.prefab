@@ -37,6 +37,7 @@ Transform:
   m_Children:
   - {fileID: 1480646847161687970}
   - {fileID: 1006614441573114175}
+  - {fileID: 2027750811195262115}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -164,9 +165,22 @@ MonoBehaviour:
   speed: 8
   MouseSen: 500
   Respawn_Time: 5
+  weaponInfo:
+    weaponName: 0
+    wholeAmmo: 0
+    currentAmmo: 0
+    maxAmmo: 0
+    attackRate: 0
+    attackDistance: 0
+    isAutomaticAttack: 0
+    recoilAmount: 0
+    recoilRecoverySpeed: 0
+  weapon: {fileID: 8464661707742565865}
+  currentRecoil: 0
   Attack_point: {fileID: 1694475315678981098}
   rb_player: {fileID: 4784240305978912532}
   rb_weapon: {fileID: 5266273522526468471}
+  Feet: {fileID: 3659694881847774701}
   bc: {fileID: 6011571918895888910, guid: e7bb071102ef2424fabf52071da11e1f, type: 3}
   gm: {fileID: 0}
   canFire: 1
@@ -222,6 +236,37 @@ MonoBehaviour:
   compressRotation: 0
   positionPrecision: 0.01
   scalePrecision: 0.01
+--- !u!1 &3659694881847774701
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2027750811195262115}
+  m_Layer: 7
+  m_Name: Feet
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2027750811195262115
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3659694881847774701}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.45, z: 0}
+  m_LocalScale: {x: 1, y: 0.01, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7782723524607573140}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4091559258788594763
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,6 +280,7 @@ GameObject:
   - component: {fileID: 7585255693054170088}
   - component: {fileID: 5266273522526468471}
   - component: {fileID: 8709032270354986824}
+  - component: {fileID: 8464661707742565865}
   m_Layer: 7
   m_Name: Weapon
   m_TagString: Weapon
@@ -355,6 +401,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2.0000005, z: 1.0000005}
   m_Center: {x: 0.00000005960464, y: 1.2705494e-21, z: -0.00000008940699}
+--- !u!114 &8464661707742565865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4091559258788594763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50f030227bab3cc44ae7bdc2ca5ad6c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onAmmoEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  weaponInfo:
+    weaponName: 0
+    wholeAmmo: 60
+    currentAmmo: 0
+    maxAmmo: 30
+    attackRate: 0
+    attackDistance: 0
+    isAutomaticAttack: 0
+    recoilAmount: 1
+    recoilRecoverySpeed: 3
+  canShoot: 1
+  pc: {fileID: 0}
 --- !u!1 &6206302898504278929
 GameObject:
   m_ObjectHideFlags: 0

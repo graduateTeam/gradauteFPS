@@ -36,23 +36,35 @@ public class Player_Control : NetworkBehaviour
     [SyncVar]
     public float Respawn_Time;    //리스폰 시간
 
+    public WeaponAssaultRifle AssaultRifle;
+
+    public float currentRecoil; // 현재 반동 상태
+
+    public float recoilAmount;  // 반동의 양
+    public float last_recoilAmount; //최근 반동의 양
+
+    public float recoilRecoverySpeed;   // 반동 회복 속도
+    public float last_recoilRecoverySpeed; //최근 반동 회복 속도
+
     public GameObject Attack_point; //혹시 피격을 위한 오브젝트
     
     public Rigidbody rb_player; //플레이어의 리지드바디
 
     public Rigidbody rb_weapon; //무기의 리지드바디
 
+    public GameObject Feet;
+
     public Bullet_Control bc;
     public GameManager gm;
-
-    private float recoilAmount = 1.0f; // 반동의 양
-    private float recoilRecoverySpeed = 3.0f; // 반동 회복 속도
-    private float currentRecoil = 0.0f; // 현재 반동 상태 //Weapon_info에서 추후 받아올 것임
 
     [SyncVar]
     public bool canFire = true;
 
     // Update is called once per frame
+    private void Start()
+    {
+        AssaultRifle = this.GetComponentInChildren<WeaponAssaultRifle>();
+    }
     void FixedUpdate()
     {
         player_movement();
@@ -63,24 +75,65 @@ public class Player_Control : NetworkBehaviour
         }
 
         Rotate();
+
+        RaycastHit hit;
+        // 발 위치에서 앞쪽으로 Ray를 쏘기
+        if (Physics.Raycast(Feet.transform.position, Feet.transform.forward, out hit, 1f))
+        {
+            // 장애물의 높이 체크
+            if (hit.transform.position.y >= (Feet.transform.position.y + 2) && hit.transform.position.y < (Feet.transform.position.y + 1)) // '2'는 넘을 수 있는 최대 높이
+            {
+                //장애물 넘기
+                Vector3 jumpForce = new Vector3(0, CalculateJumpVerticalSpeed(), 0);
+                rb_player.AddForce(jumpForce, ForceMode.Impulse);
+            }
+        }
+
     }
 
     private void Update()
     {
+        float[] reciveFromWeapon = AssaultRifle.giveToPC();
+
+        /*계속 덮어씌우는 것을 방지하기 위해 last를 관리 한다
+        하지만 둘 다 0 일 떄, 값을 받아오지 않는 문제가 있기 때문에 0일 때는 무조건 받아오도록 한다.*/
+        if(last_recoilAmount != recoilAmount || (recoilAmount == 0 && last_recoilAmount == recoilAmount))
+        {
+            recoilAmount = reciveFromWeapon[0];
+            last_recoilAmount = recoilAmount;
+        }
+        if(last_recoilRecoverySpeed != recoilRecoverySpeed || (recoilRecoverySpeed == 0 && last_recoilRecoverySpeed == recoilRecoverySpeed))
+        {
+            recoilRecoverySpeed = reciveFromWeapon[1];
+            last_recoilRecoverySpeed = recoilRecoverySpeed;
+        }
+        
         gm.HP_UI_Update(HP);
 
-        // 반동을 부드럽게 적용한다.
-        if (currentRecoil > 0 && !canFire)  //시간에 따른다 = 총 발사 후(canFire == currentRecoil이 양수로 더해지는 것)
-        {
-            MouseY -= currentRecoil * Time.deltaTime;   //시간에 따른 반동적용(!canFire인 시간이 길어질 수록 위로 심하게 밀림)
-            currentRecoil -= recoilRecoverySpeed * Time.deltaTime;  //시간에 따른 반동회복(그만큼 회복도 많이 시켜줌)
-            currentRecoil = Mathf.Max(currentRecoil, 0);
-        }
-
-        if(NetworkServer.active)
+        if(NetworkServer.active && !gm.Time_isMinus())
         {
             Time_spent();
         }
+    }
+
+    public void Rebound()
+    {
+        // 반동을 부드럽게 적용한다.
+        if (AssaultRifle.canShoot)  //시간에 따른다
+        {
+            MouseY += currentRecoil * Time.deltaTime;   //시간에 따른 반동적용
+            currentRecoil += recoilAmount;  //반동을 더해간다.
+
+            currentRecoil -= recoilRecoverySpeed * Time.deltaTime;  //시간에 따른 반동회복(그만큼 회복도 많이 시켜줌)
+            currentRecoil = Mathf.Max(currentRecoil, 0);
+        }
+    }
+
+    // 점프 속도 계산
+    float CalculateJumpVerticalSpeed()
+    {
+        // 물리식으로 점프 높이를 계산합니다 (높이 = 0.5 * 중력 * 점프시간^2)
+        return Mathf.Sqrt(2 * 2 * Physics.gravity.magnitude);
     }
 
     private void player_movement()
@@ -96,15 +149,21 @@ public class Player_Control : NetworkBehaviour
                 float Horizontal_move = Input.GetAxis("Horizontal");
                 float Vertical_move = Input.GetAxis("Vertical");
 
-                jumpDirection = new Vector3(Horizontal_move, 0, Vertical_move);
+                /* 이동 방향 계산
+                   - transform.right * Horizontal_move: 수평 입력에 따른 이동 벡터
+                   - new Vector3(transform.forward.x, 0, transform.forward.z) * Vertical_move: 수직 입력에 따른 이동 벡터, y 성분 0으로 설정하여 수평적으로만 움직임
+                   - 두 이동 벡터 더한 후 .normalized로 크기 1로 만듦 -> 대각선 이동 시 속도 일정하게 유지 */
+                Vector3 moveDirection = (transform.right * Horizontal_move + new Vector3(transform.forward.x, 0, transform.forward.z) * Vertical_move).normalized;
 
-                vec = transform.TransformDirection(jumpDirection) * speed * Time.deltaTime;
 
-                jumpDirection = vec;
+                // 최종 이동 벡터 계산.moveDirection에 이동 속도(speed)와 프레임 간 시간(Time.deltaTime) 곱함->일정한 속도로 움직임
+                vec = moveDirection * speed * Time.deltaTime;
+
                 if (isOwned)
                 {
                     rb_player.AddForce(vec, ForceMode.Impulse);
                     rb_player.velocity = Vector3.ClampMagnitude(rb_player.velocity, lim_Speed);
+                    jumpDirection = Vector3.zero;
                 }
 
             }
@@ -114,7 +173,9 @@ public class Player_Control : NetworkBehaviour
                 isJump = true; //2중 점프 막기
                 wasd = false;   //점프 중 움직임 막기
 
-                vec = transform.TransformDirection(new Vector3(jumpDirection.x, jumpPower, jumpDirection.z)) * speed * Time.deltaTime;
+                // 월드 좌표를 기준으로 점프 벡터 설정
+                vec = new Vector3(jumpDirection.x, jumpPower, jumpDirection.z) * speed * Time.deltaTime;
+
                 Debug.Log("점프");
                 if (isOwned)
                 {
@@ -213,8 +274,8 @@ public class Player_Control : NetworkBehaviour
     IEnumerator Weapon_delay()
     {
         canFire = false;
-        currentRecoil += recoilAmount;  //반동을 더해간다.
-        bc.Bullet_Shoot(rb_weapon);
+        bc.Bullet_Shoot(rb_weapon, rb_player);
+        Rebound();
 
         yield return new WaitForSeconds(0.2f);  //임의값
         canFire = true;
@@ -234,9 +295,9 @@ public class Player_Control : NetworkBehaviour
 
             MouseY += Input.GetAxisRaw("Mouse Y") * MouseSen * Time.deltaTime;
 
-            MouseY = Mathf.Clamp(MouseY, -90f, 90f);    //위 아래 고개 최대 범위 -75 ~ 75
+            MouseY = Mathf.Clamp(MouseY, -90f, 90f);    //위 아래 고개 최대 범위 -90 ~ 90
 
-            Quaternion quat = Quaternion.Euler(new Vector3(MouseY, -MouseX, 0));
+            Quaternion quat = Quaternion.Euler(new Vector3(-MouseY, MouseX, 0));
             transform.rotation
                 = Quaternion.Slerp(transform.rotation, quat, Time.fixedDeltaTime *MouseSen);
         }
@@ -247,7 +308,7 @@ public class Player_Control : NetworkBehaviour
     {
         Vector3 Spawn_Point = new Vector3(0, 20, 0);
         Attack_point.transform.position = Spawn_Point;
-        Attack_point.transform.Translate(0, 0, 0);
+        Attack_point.transform.Translate(55f, 0, -0.6140758f);
         Attack_point.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
         NetworkServer.Spawn(Attack_point); //맨 위의 어택 포인트(부모)만 소환해야 분신이 안 생긴다.
@@ -272,6 +333,8 @@ public class Player_Control : NetworkBehaviour
 
         bc = Bullet_Control.bc_instance;    //NetworkBehavior를 상속받게 된다면 통상 new ~~ 이런 식의 인스턴스화는 불가능하게 된다.
 
+        bc.weapon = Attack_Object.GetComponentInChildren<WeaponAssaultRifle>();
+
         gm = GameManager.gm_instance;
 
         gm.UI_Init();   //UI 초기화
@@ -286,7 +349,7 @@ public class Player_Control : NetworkBehaviour
                 isJump = false;
                 wasd = true;
 
-                //rb_player.velocity = new Vector3(jumpDirection.x, 0, jumpDirection.z);
+                Debug.Log("땅에 착지: " + isJump + " // " + wasd);
             }
         }
     }
