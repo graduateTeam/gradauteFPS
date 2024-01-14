@@ -64,6 +64,10 @@ public class GameManager : MonoBehaviour
         AmmoText.text = string.Format("{0} / {1}", currentAmmo, maximum);
     }
 
+    public void getGunLabel(WeaponName weaponName)
+    {
+        gunLabel.text = weaponName.ToString();
+    }
 
     public void HP_UI_Update(int hp)
     {

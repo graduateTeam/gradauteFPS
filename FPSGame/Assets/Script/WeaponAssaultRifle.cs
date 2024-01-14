@@ -28,6 +28,7 @@ public class WeaponAssaultRifle : MonoBehaviour
         weaponInfo.currentAmmo = weaponInfo.maxAmmo;
 
         GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
+        GameManager.gm_instance.getGunLabel(WeaponInfo.weaponName);
 
         canShoot = true;
     }

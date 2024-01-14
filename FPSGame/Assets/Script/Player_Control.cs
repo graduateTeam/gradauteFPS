@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Mirror;
 using System;
+using UnityEditor.U2D.Sprites;
 
 /*
 * 괜히 GameManabger로 분리 시킬 생각하지마라 골치 아파진다.
@@ -17,6 +18,9 @@ public class Player_Control : NetworkBehaviour
     public float MouseX;
     public float MouseY;    //마우스에 따른 몸의 움직임
     private Vector3 jumpDirection;
+
+    [SyncVar]
+    public bool moving;
 
     [SyncVar]
     public int HP;  //플레이어의 체력
@@ -41,10 +45,10 @@ public class Player_Control : NetworkBehaviour
     public float currentRecoil; // 현재 반동 상태
 
     public float recoilAmount;  // 반동의 양
-    public float last_recoilAmount; //최근 반동의 양
+    public float origin_recoilAmount;
 
     public float recoilRecoverySpeed;   // 반동 회복 속도
-    public float last_recoilRecoverySpeed; //최근 반동 회복 속도
+    public float origin_recoilRecoverySpeed;
 
     public GameObject Attack_point; //혹시 피격을 위한 오브젝트
     
@@ -76,6 +80,8 @@ public class Player_Control : NetworkBehaviour
 
         Rotate();
 
+        Rebound();
+
         RaycastHit hit;
         // 발 위치에서 앞쪽으로 Ray를 쏘기
         if (Physics.Raycast(Feet.transform.position, Feet.transform.forward, out hit, 1f))
@@ -97,15 +103,15 @@ public class Player_Control : NetworkBehaviour
 
         /*계속 덮어씌우는 것을 방지하기 위해 last를 관리 한다
         하지만 둘 다 0 일 떄, 값을 받아오지 않는 문제가 있기 때문에 0일 때는 무조건 받아오도록 한다.*/
-        if(last_recoilAmount != recoilAmount || (recoilAmount == 0 && last_recoilAmount == recoilAmount))
+        if(recoilAmount != reciveFromWeapon[0] || (recoilAmount == 0 && reciveFromWeapon[0] == recoilAmount))
         {
             recoilAmount = reciveFromWeapon[0];
-            last_recoilAmount = recoilAmount;
+            origin_recoilAmount = recoilAmount;
         }
-        if(last_recoilRecoverySpeed != recoilRecoverySpeed || (recoilRecoverySpeed == 0 && last_recoilRecoverySpeed == recoilRecoverySpeed))
+        if(recoilRecoverySpeed != reciveFromWeapon[1] || (recoilRecoverySpeed == 0 && reciveFromWeapon[1] == recoilRecoverySpeed))
         {
             recoilRecoverySpeed = reciveFromWeapon[1];
-            last_recoilRecoverySpeed = recoilRecoverySpeed;
+            origin_recoilRecoverySpeed = recoilRecoverySpeed;
         }
         
         gm.HP_UI_Update(HP);
@@ -119,13 +125,19 @@ public class Player_Control : NetworkBehaviour
     public void Rebound()
     {
         // 반동을 부드럽게 적용한다.
-        if (AssaultRifle.canShoot)  //시간에 따른다
+        if (AssaultRifle.canShoot && !canFire)  //시간에 따른다
         {
-            MouseY += currentRecoil * Time.deltaTime;   //시간에 따른 반동적용
-            currentRecoil += recoilAmount;  //반동을 더해간다.
+            MouseY += currentRecoil * Time.deltaTime; // 시간에 따른 반동 적용
+            currentRecoil -= recoilRecoverySpeed * Time.deltaTime; // 시간에 따른 반동 감소
+            currentRecoil = Mathf.Max(currentRecoil, recoilAmount * 0.9f); // 반동이 0보다 작아지지 않도록 함
+        }
+        else // 총을 쏘지 않는 상태라면
+        {
+            if(currentRecoil != origin_recoilAmount)
+                currentRecoil = origin_recoilAmount; // 반동을 원래의 값으로 복구
 
-            currentRecoil -= recoilRecoverySpeed * Time.deltaTime;  //시간에 따른 반동회복(그만큼 회복도 많이 시켜줌)
-            currentRecoil = Mathf.Max(currentRecoil, 0);
+            if(recoilRecoverySpeed != origin_recoilRecoverySpeed)
+                recoilRecoverySpeed = origin_recoilRecoverySpeed;
         }
     }
 
@@ -159,6 +171,13 @@ public class Player_Control : NetworkBehaviour
                 // 최종 이동 벡터 계산.moveDirection에 이동 속도(speed)와 프레임 간 시간(Time.deltaTime) 곱함->일정한 속도로 움직임
                 vec = moveDirection * speed * Time.deltaTime;
 
+                if(!moving)
+                {
+                    moving = true;
+                    recoilAmount *= 1.5f;
+                    recoilRecoverySpeed *= 0.8f;
+                }
+                
                 if (isOwned)
                 {
                     rb_player.AddForce(vec, ForceMode.Impulse);
@@ -166,6 +185,10 @@ public class Player_Control : NetworkBehaviour
                     jumpDirection = Vector3.zero;
                 }
 
+            }
+            else
+            {
+                moving = false;
             }
 
             if (!isJump && Input.GetButton("Jump"))
@@ -176,11 +199,21 @@ public class Player_Control : NetworkBehaviour
                 // 월드 좌표를 기준으로 점프 벡터 설정
                 vec = new Vector3(jumpDirection.x, jumpPower, jumpDirection.z) * speed * Time.deltaTime;
 
-                Debug.Log("점프");
+                if (!moving)
+                {
+                    moving = true;
+                    recoilAmount *= 1.5f;
+                    recoilRecoverySpeed *= 0.8f;
+                }
+
                 if (isOwned)
                 {
                     rb_player.AddForce(vec, ForceMode.Impulse);
                 }
+            }
+            else
+            {
+                moving = false;
             }
 
             if (Input.GetButton("Fire1"))
@@ -275,7 +308,6 @@ public class Player_Control : NetworkBehaviour
     {
         canFire = false;
         bc.Bullet_Shoot(rb_weapon, rb_player);
-        Rebound();
 
         yield return new WaitForSeconds(0.2f);  //임의값
         canFire = true;
@@ -296,11 +328,11 @@ public class Player_Control : NetworkBehaviour
             MouseY += Input.GetAxisRaw("Mouse Y") * MouseSen * Time.deltaTime;
 
             MouseY = Mathf.Clamp(MouseY, -90f, 90f);    //위 아래 고개 최대 범위 -90 ~ 90
-
-            Quaternion quat = Quaternion.Euler(new Vector3(-MouseY, MouseX, 0));
-            transform.rotation
-                = Quaternion.Slerp(transform.rotation, quat, Time.fixedDeltaTime *MouseSen);
         }
+
+        Quaternion quat = Quaternion.Euler(new Vector3(-MouseY, MouseX, 0));
+        transform.rotation
+            = Quaternion.Slerp(transform.rotation, quat, Time.fixedDeltaTime * MouseSen);
     }
 
     [Server]
@@ -338,6 +370,8 @@ public class Player_Control : NetworkBehaviour
         gm = GameManager.gm_instance;
 
         gm.UI_Init();   //UI 초기화
+
+        moving = false;
     }
 
     private void OnCollisionEnter(Collision collision)

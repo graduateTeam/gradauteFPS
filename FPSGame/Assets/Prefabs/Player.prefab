@@ -165,18 +165,10 @@ MonoBehaviour:
   speed: 8
   MouseSen: 500
   Respawn_Time: 5
-  weaponInfo:
-    weaponName: 0
-    wholeAmmo: 0
-    currentAmmo: 0
-    maxAmmo: 0
-    attackRate: 0
-    attackDistance: 0
-    isAutomaticAttack: 0
-    recoilAmount: 0
-    recoilRecoverySpeed: 0
-  weapon: {fileID: 8464661707742565865}
+  AssaultRifle: {fileID: 0}
   currentRecoil: 0
+  recoilAmount: 0
+  recoilRecoverySpeed: 0
   Attack_point: {fileID: 1694475315678981098}
   rb_player: {fileID: 4784240305978912532}
   rb_weapon: {fileID: 5266273522526468471}
@@ -424,10 +416,8 @@ MonoBehaviour:
     attackRate: 0
     attackDistance: 0
     isAutomaticAttack: 0
-    recoilAmount: 1
-    recoilRecoverySpeed: 3
-  canShoot: 1
-  pc: {fileID: 0}
+    recoilAmount: 10
+    recoilRecoverySpeed: 0.15
 --- !u!1 &6206302898504278929
 GameObject:
   m_ObjectHideFlags: 0
