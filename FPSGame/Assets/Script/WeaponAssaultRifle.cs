@@ -1,11 +1,14 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 [System.Serializable]
 public class AmmoEvent : UnityEngine.Events.UnityEvent<int, int> { }
 public class WeaponAssaultRifle : MonoBehaviour
 {
     public Weapon_Info WeaponInfo { get; set; }
+
+    private Bullet_Control bc;
 
     [HideInInspector]
     public AmmoEvent onAmmoEvent = new AmmoEvent();
@@ -31,12 +34,23 @@ public class WeaponAssaultRifle : MonoBehaviour
         GameManager.gm_instance.getGunLabel(WeaponInfo.weaponName);
 
         canShoot = true;
+        bc = Bullet_Control.bc_instance;
     }
 
     public float[] giveToPC()
     {
         float[] temp = {weaponInfo.recoilAmount, weaponInfo.recoilRecoverySpeed};
         return temp;
+    }
+
+    public float weapon_attackRate()
+    {
+        return weaponInfo.attackRate;
+    }
+
+    private void Start()
+    {
+        bc.get_Info(weaponInfo.attackDistance, weaponInfo.bulletSpeed);
     }
 
     private void Update()

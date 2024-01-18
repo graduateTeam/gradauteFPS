@@ -40,6 +40,9 @@ public class Player_Control : NetworkBehaviour
     [SyncVar]
     public float Respawn_Time;    //리스폰 시간
 
+    [SyncVar]
+    public float attackRate;    //총 사이 간격
+
     public WeaponAssaultRifle AssaultRifle;
 
     public float currentRecoil; // 현재 반동 상태
@@ -68,6 +71,8 @@ public class Player_Control : NetworkBehaviour
     private void Start()
     {
         AssaultRifle = this.GetComponentInChildren<WeaponAssaultRifle>();
+
+        attackRate = AssaultRifle.weapon_attackRate();
     }
     void FixedUpdate()
     {
@@ -283,7 +288,7 @@ public class Player_Control : NetworkBehaviour
         //죽는 소리 및 애니메이션
     }
 
-    IEnumerator Respawn()
+    /*IEnumerator Respawn()
     {
         float startTime = Time.time;
         float elapsedTime = 0;
@@ -302,23 +307,25 @@ public class Player_Control : NetworkBehaviour
             alive = true;
             RpcRespawn();
         }
-    }
+    }*/
 
     IEnumerator Weapon_delay()
     {
         canFire = false;
         bc.Bullet_Shoot(rb_weapon, rb_player);
 
-        yield return new WaitForSeconds(0.2f);  //임의값
+        Debug.Log(attackRate);
+
+        yield return new WaitForSeconds(attackRate);  //임의값
         canFire = true;
     }
 
-    [ClientRpc] //모든 클라이언트에서 서버의 명령을 받고 해당 플레이어를 부활로 처리
+    /*[ClientRpc] //모든 클라이언트에서 서버의 명령을 받고 해당 플레이어를 부활로 처리
     void RpcRespawn()
     {
         //부활 및 좌표 변경
     }
-
+*/
     private void Rotate()   //이렇게 하게되면 마우스에 따라 플레이어가 각도를 틀지만, 조금 더 자연스러운 움직임을 위해 머리 몸통을 나눠서 움직여야 할 듯?
     {
         if(alive)

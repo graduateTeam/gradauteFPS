@@ -15,6 +15,16 @@ public class Bullet_Control : NetworkBehaviour
     [SerializeField]
     public WeaponAssaultRifle weapon;
     // Start is called before the first frame update
+
+    private float attackDis;
+    private float attackSpd;
+
+    public void get_Info(float attackDis, float attackSpd)
+    {
+        this.attackDis = attackDis;
+        this.attackSpd = attackSpd;
+    }
+
     void Awake()
     {
         bp = Bullet_Pool.bp_instance;
@@ -79,10 +89,10 @@ public class Bullet_Control : NetworkBehaviour
         }
         else
         {   //10에 총의 사거리를 넣자
-            targetPoint = ray.origin + ray.direction * 10;
+            targetPoint = ray.origin + ray.direction * attackDis;
         }
 
-        Debug.DrawRay(ray.origin, ray.direction * 10, Color.red);
+        Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
 
         Vector3 attackDirection = (targetPoint - gunEndPos).normalized;
         attackDirection = Vector3.Scale(attackDirection, new Vector3(-1, -1, -1));
@@ -96,7 +106,7 @@ public class Bullet_Control : NetworkBehaviour
         bullet.transform.rotation = Quaternion.LookRotation(attackDirection);
 
         // 총알에 힘을 가함
-        bullet.GetComponent<Rigidbody>().velocity = attackDirection * 60;
+        bullet.GetComponent<Rigidbody>().velocity = attackDirection * attackSpd;
 
         if (Physics.Raycast(gunEndPos, attackDirection, out hit, 1000))
         {

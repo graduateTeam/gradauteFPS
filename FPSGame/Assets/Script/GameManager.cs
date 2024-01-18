@@ -14,8 +14,6 @@ public class GameManager : MonoBehaviour
 
     public static GameManager gm_instance;
 
-    public TextMeshProUGUI Red_kill_UI;
-    public TextMeshProUGUI Blue_kill_UI;
     public TextMeshProUGUI game_Time_UI;
 
     private int Red_kill;
@@ -35,7 +33,6 @@ public class GameManager : MonoBehaviour
     private TextMeshProUGUI AmmoText;
     [SerializeField]
     private TextMeshProUGUI gunLabel;
-
 
     private void Awake()
     {

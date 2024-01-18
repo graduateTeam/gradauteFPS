@@ -159,6 +159,7 @@ MonoBehaviour:
   wasd: 1
   MouseX: 0
   MouseY: 0
+  moving: 0
   HP: 100
   lim_Speed: 15
   jumpPower: 50
@@ -168,7 +169,9 @@ MonoBehaviour:
   AssaultRifle: {fileID: 0}
   currentRecoil: 0
   recoilAmount: 0
+  origin_recoilAmount: 0
   recoilRecoverySpeed: 0
+  origin_recoilRecoverySpeed: 0
   Attack_point: {fileID: 1694475315678981098}
   rb_player: {fileID: 4784240305978912532}
   rb_weapon: {fileID: 5266273522526468471}
@@ -413,8 +416,9 @@ MonoBehaviour:
     wholeAmmo: 60
     currentAmmo: 0
     maxAmmo: 30
-    attackRate: 0
-    attackDistance: 0
+    bulletSpeed: 100
+    attackRate: 0.1
+    attackDistance: 20
     isAutomaticAttack: 0
     recoilAmount: 10
     recoilRecoverySpeed: 0.15
