@@ -50,9 +50,17 @@ public class GameManager : MonoBehaviour
 
     public void AimPos(Vector3 pos)
     {
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(pos);
-        Debug.Log("screenPos.y: " + screenPos.y);
-        ImageAim.transform.position = new Vector3(ImageAim.transform.position.x, screenPos.y, ImageAim.transform.position.z);
+        Vector3 viewportPos = Camera.main.WorldToViewportPoint(pos);
+        Debug.Log("시작: " + viewportPos);
+        if (!(viewportPos.z > 0 && viewportPos.x >= 0) && !(viewportPos.x <= 1 && viewportPos.y >= 0 && viewportPos.y <= 1))
+        {
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(pos);
+            ImageAim.transform.position = new Vector3(screenPos.x, screenPos.y, ImageAim.transform.position.z);
+            Vector3 cameraPos = Camera.main.transform.position;
+            Debug.Log("전: " + cameraPos);
+            Camera.main.transform.position = new Vector3(cameraPos.x, ImageAim.transform.position.y, cameraPos.z);
+            Debug.Log("후: "+Camera.main.transform.position);
+        }
     }
 
 

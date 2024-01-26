@@ -166,6 +166,7 @@ MonoBehaviour:
   speed: 8
   MouseSen: 500
   Respawn_Time: 5
+  attackRate: 0
   AssaultRifle: {fileID: 0}
   currentRecoil: 0
   recoilAmount: 0
@@ -291,7 +292,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4091559258788594763}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0.4, y: 0, z: 1}
   m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -416,7 +417,7 @@ MonoBehaviour:
     wholeAmmo: 60
     currentAmmo: 0
     maxAmmo: 30
-    bulletSpeed: 100
+    bulletSpeed: 120
     attackRate: 0.1
     attackDistance: 20
     isAutomaticAttack: 0

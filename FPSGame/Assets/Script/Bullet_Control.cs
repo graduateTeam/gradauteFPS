@@ -1,4 +1,5 @@
 using Mirror;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,31 @@ public class Bullet_Control : NetworkBehaviour
 
     private float attackDis;
     private float attackSpd;
+
+    public GameObject player;
+    public Rigidbody rb_gun;
+    public Rigidbody rb_player;
+    public Collider gunCollider;
+
+    public void getFromPC(GameObject player, Rigidbody rb_gun)
+    {
+        this.player = player;
+        this.rb_gun = rb_gun;
+
+        this.rb_player = player.GetComponent<Rigidbody>();
+        this.gunCollider = rb_player.GetComponent<Collider>();
+
+        GameObject gun = null;
+
+        Transform gunTransform = player.transform.Find("Weapon");
+        if (gunTransform != null)
+        {
+            gun = gunTransform.gameObject;
+        }
+
+        this.gunEndPos = rb_gun.transform.position + (rb_player.transform.forward *0.66f);
+        this.gunEndPos += rb_player.transform.right * gun.transform.localPosition.x;
+    }
 
     public void get_Info(float attackDis, float attackSpd)
     {
@@ -55,9 +81,8 @@ public class Bullet_Control : NetworkBehaviour
             
     }
 
-
-    public void Bullet_Shoot(Rigidbody gun, Rigidbody player)
-    {
+    public void Bullet_Shoot()   //그냥 총의 rigidBody는 받아라 그냥;;
+    { 
         if (weapon == null)
         {
             Debug.LogError("Weapon is null!");
@@ -70,16 +95,12 @@ public class Bullet_Control : NetworkBehaviour
 
         GameObject bullet = bp.GetBullet();
 
-        Collider collider = gun.GetComponent<Collider>();
-        float gunLength = collider.bounds.size.z;
-        Vector3 gunEndPos = gun.transform.position + gun.transform.rotation * Vector3.forward * gunLength;
-
         RaycastHit hit;
         Vector3 targetPoint = Vector3.zero;
 
         //화면 정중앙 좌표
         Ray oldray = Camera.main.ViewportPointToRay(Vector2.one * 0.5f);
-        Ray ray = new Ray(player.transform.position, gun.transform.rotation * oldray.direction);
+        Ray ray = new Ray(rb_player.transform.position, rb_player.transform.rotation * oldray.direction);
 
 
         if (Physics.Raycast(ray, out hit, 1000))
@@ -94,10 +115,8 @@ public class Bullet_Control : NetworkBehaviour
 
         Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
 
-        Vector3 attackDirection = (targetPoint - gunEndPos).normalized;
-        attackDirection = Vector3.Scale(attackDirection, new Vector3(-1, -1, -1));
-
-
+        //방향을 플레이어가 바라보는 방향으로 조정
+        Vector3 attackDirection = rb_player.transform.forward;
 
         // 총알의 위치를 총의 끝으로 설정
         bullet.transform.position = gunEndPos;
@@ -112,5 +131,6 @@ public class Bullet_Control : NetworkBehaviour
         {
 
         }
+
     }
 }

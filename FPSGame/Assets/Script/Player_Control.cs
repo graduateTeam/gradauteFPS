@@ -3,6 +3,7 @@ using UnityEngine;
 using Mirror;
 using System;
 using UnityEditor.U2D.Sprites;
+using Unity.VisualScripting;
 
 /*
 * 괜히 GameManabger로 분리 시킬 생각하지마라 골치 아파진다.
@@ -125,6 +126,8 @@ public class Player_Control : NetworkBehaviour
         {
             Time_spent();
         }
+
+        bc.getFromPC(Attack_point, rb_weapon);
     }
 
     public void Rebound()
@@ -312,7 +315,16 @@ public class Player_Control : NetworkBehaviour
     IEnumerator Weapon_delay()
     {
         canFire = false;
-        bc.Bullet_Shoot(rb_weapon, rb_player);
+        try
+        {
+            bc.Bullet_Shoot();
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+        
+        
 
         Debug.Log(attackRate);
 
