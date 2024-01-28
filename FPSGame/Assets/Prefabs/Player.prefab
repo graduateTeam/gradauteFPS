@@ -414,10 +414,10 @@ MonoBehaviour:
       m_Calls: []
   weaponInfo:
     weaponName: 0
-    wholeAmmo: 60
+    wholeAmmo: 180
     currentAmmo: 0
     maxAmmo: 30
-    bulletSpeed: 120
+    bulletSpeed: 100
     attackRate: 0.1
     attackDistance: 20
     isAutomaticAttack: 0

@@ -41,7 +41,7 @@ public class Bullet_Control : NetworkBehaviour
             gun = gunTransform.gameObject;
         }
 
-        this.gunEndPos = rb_gun.transform.position + (rb_player.transform.forward *0.66f);
+        this.gunEndPos = rb_gun.transform.position + (rb_player.transform.forward *0.75f);
         this.gunEndPos += rb_player.transform.right * gun.transform.localPosition.x;
     }
 
@@ -94,6 +94,9 @@ public class Bullet_Control : NetworkBehaviour
         if (!weapon.canShoot) return;
 
         GameObject bullet = bp.GetBullet();
+
+        bullet.gameObject.name = "kjih's bullet";   //날라가는 순간 이름 변경(플레이어 + bullet) 누군가의 총알인지 파악
+        Debug.Log("Bullet name change: " + bullet.gameObject.name);
 
         RaycastHit hit;
         Vector3 targetPoint = Vector3.zero;

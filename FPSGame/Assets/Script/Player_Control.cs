@@ -282,7 +282,7 @@ public class Player_Control : NetworkBehaviour
         alive = false;
         HP = 0;
         RpcplayerDies();
-        StartCoroutine("Respawn");
+        //StartCoroutine("Respawn");
     }
 
     [ClientRpc]
@@ -323,10 +323,6 @@ public class Player_Control : NetworkBehaviour
         {
             Debug.Log(e);
         }
-        
-        
-
-        Debug.Log(attackRate);
 
         yield return new WaitForSeconds(attackRate);  //ÀÓÀÇ°ª
         canFire = true;
@@ -401,8 +397,6 @@ public class Player_Control : NetworkBehaviour
             {
                 isJump = false;
                 wasd = true;
-
-                Debug.Log("¶¥¿¡ ÂøÁö: " + isJump + " // " + wasd);
             }
         }
     }

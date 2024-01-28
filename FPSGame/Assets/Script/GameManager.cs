@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
 {
     public Image HP_bar;
     public TextMeshProUGUI HP_text;
-    public Image Respawn_bar;
+    //public Image Respawn_bar;
     public Image ImageAim;
 
     public static GameManager gm_instance;
@@ -51,15 +51,14 @@ public class GameManager : MonoBehaviour
     public void AimPos(Vector3 pos)
     {
         Vector3 viewportPos = Camera.main.WorldToViewportPoint(pos);
-        Debug.Log("시작: " + viewportPos);
         if (!(viewportPos.z > 0 && viewportPos.x >= 0) && !(viewportPos.x <= 1 && viewportPos.y >= 0 && viewportPos.y <= 1))
         {
             Vector3 screenPos = Camera.main.WorldToScreenPoint(pos);
             ImageAim.transform.position = new Vector3(screenPos.x, screenPos.y, ImageAim.transform.position.z);
             Vector3 cameraPos = Camera.main.transform.position;
-            Debug.Log("전: " + cameraPos);
+
             Camera.main.transform.position = new Vector3(cameraPos.x, ImageAim.transform.position.y, cameraPos.z);
-            Debug.Log("후: "+Camera.main.transform.position);
+
         }
     }
 
@@ -79,15 +78,15 @@ public class GameManager : MonoBehaviour
         HP_bar.fillAmount = hp / 100f;
         HP_text.text = string.Format("{0} / 100", hp);
 
-        if(hp <= 0)
+        /*if(hp <= 0)
             Respawn_bar.gameObject.SetActive(true);
         else
-            Respawn_bar.gameObject.SetActive(false);
+            Respawn_bar.gameObject.SetActive(false);*/
     }
 
     public void Respawn_bar_Update(float time, float fullTime)
     {
-        Respawn_bar.fillAmount = time / fullTime;   
+        //Respawn_bar.fillAmount = time / fullTime;   
     }
 
     public void UI_Init()
