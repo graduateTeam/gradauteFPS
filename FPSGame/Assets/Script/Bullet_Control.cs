@@ -21,14 +21,12 @@ public class Bullet_Control : NetworkBehaviour
     private float attackSpd;
 
     public GameObject player;
-    public Rigidbody rb_gun;
     public Rigidbody rb_player;
     public Collider gunCollider;
 
-    public void getFromPC(GameObject player, Rigidbody rb_gun, MeshCollider mesh_gun)
+    public void getFromPC(GameObject player, MeshCollider mesh_gun)
     {
         this.player = player;
-        this.rb_gun = rb_gun;
 
         this.rb_player = player.GetComponent<Rigidbody>();
         this.gunCollider = rb_player.GetComponent<Collider>();

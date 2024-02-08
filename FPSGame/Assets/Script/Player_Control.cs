@@ -131,7 +131,7 @@ public class Player_Control : NetworkBehaviour
             Time_spent();
         }
 
-        bc.getFromPC(Attack_point, rb_weapon, mesh_weapon);
+        bc.getFromPC(Attack_point, mesh_weapon);
     }
 
     public void Rebound()
