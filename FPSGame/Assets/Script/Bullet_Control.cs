@@ -41,7 +41,7 @@ public class Bullet_Control : NetworkBehaviour
             gun = gunTransform.gameObject;
         }
 
-        this.gunEndPos = rb_gun.transform.position + (rb_player.transform.forward * 0.75f);
+        this.gunEndPos = rb_gun.transform.position + (rb_player.transform.forward *0.75f);
         this.gunEndPos += rb_player.transform.right * gun.transform.localPosition.x;
     }
 
@@ -56,7 +56,7 @@ public class Bullet_Control : NetworkBehaviour
         bp = Bullet_Pool.bp_instance;
         gm_instance = GameManager.gm_instance;
 
-        if (bc_instance == null)
+        if (bc_instance == null )
         {
             bc_instance = this;
         }
@@ -78,9 +78,8 @@ public class Bullet_Control : NetworkBehaviour
         {
             bp.ReturnBullet(this.gameObject);
         }
-
+            
     }
-
     public void Bullet_Shoot()   //그냥 총의 rigidBody는 받아라 그냥;;
     {
         if (weapon == null)

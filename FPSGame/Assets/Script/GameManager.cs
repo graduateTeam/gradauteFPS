@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if (gm_instance == null)
+        if(gm_instance == null)
         {
             gm_instance = this;
         }
@@ -110,12 +110,12 @@ public class GameManager : MonoBehaviour
         minute = Mathf.Floor(minute);
         second = Mathf.Floor(second);
 
-        return new float[] { minute, second };
+        return new float[] {minute, second};
     }
 
     public int[] Who_kill(string team) //누군가 죽이면 킬 수 올리기
     {
-        if (team.Equals("red"))
+        if(team.Equals("red"))
         {
             Red_kill += 1;
         }
@@ -124,14 +124,15 @@ public class GameManager : MonoBehaviour
             Blue_kill += 1;
         }
 
-        return new int[] { Red_kill, Blue_kill };
+        return new int[] {Red_kill, Blue_kill};
     }
 
     public Boolean Time_isMinus()
     {
-        if (gameTime < 1)
+        if (gameTime < 1) 
             return true;
         else
             return false;
     }
 }
+

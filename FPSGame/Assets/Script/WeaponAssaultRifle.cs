@@ -18,6 +18,7 @@ public class WeaponAssaultRifle : MonoBehaviour
     [SerializeField]
     private Weapon_Info weaponInfo;
 
+
     [Header("Audio Clips")]
     [SerializeField]
     private AudioClip audioClipTakeOutWeapon;   // 무기 장착 사운드
@@ -158,7 +159,6 @@ public class WeaponAssaultRifle : MonoBehaviour
 
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
         GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
-
 
         /*while (true)
         {

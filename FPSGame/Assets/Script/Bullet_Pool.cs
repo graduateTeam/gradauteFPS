@@ -26,7 +26,6 @@ public class Bullet_Pool : NetworkBehaviour
             Destroy(this);
         }
     }
-
     private Queue<GameObject> bulletPool;
 
     public override void OnStartServer()
@@ -43,7 +42,7 @@ public class Bullet_Pool : NetworkBehaviour
             return bullet;
         }
         else
-        {
+        {   
             //없으면 새로 생성
             GameObject bullet = Instantiate(bulletPrefab);
             NetworkServer.Spawn(bullet);
