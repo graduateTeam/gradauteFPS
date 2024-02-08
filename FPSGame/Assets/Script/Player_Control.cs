@@ -55,7 +55,7 @@ public class Player_Control : NetworkBehaviour
     public float origin_recoilRecoverySpeed;
 
     public GameObject Attack_point; //혹시 피격을 위한 오브젝트
-    
+
     public Rigidbody rb_player; //플레이어의 리지드바디
 
     public Rigidbody rb_weapon; //무기의 리지드바디
@@ -109,11 +109,13 @@ public class Player_Control : NetworkBehaviour
 
         /*계속 덮어씌우는 것을 방지하기 위해 last를 관리 한다
         하지만 둘 다 0 일 떄, 값을 받아오지 않는 문제가 있기 때문에 0일 때는 무조건 받아오도록 한다.*/
+
         if(recoilAmount != reciveFromWeapon[0] || (recoilAmount == 0 && reciveFromWeapon[0] == recoilAmount))
         {
             recoilAmount = reciveFromWeapon[0];
             origin_recoilAmount = recoilAmount;
         }
+
         if(recoilRecoverySpeed != reciveFromWeapon[1] || (recoilRecoverySpeed == 0 && reciveFromWeapon[1] == recoilRecoverySpeed))
         {
             recoilRecoverySpeed = reciveFromWeapon[1];
@@ -185,7 +187,6 @@ public class Player_Control : NetworkBehaviour
                     recoilAmount *= 1.5f;
                     recoilRecoverySpeed *= 0.8f;
                 }
-                
                 if (isOwned)
                 {
                     rb_player.AddForce(vec, ForceMode.Impulse);
@@ -230,7 +231,6 @@ public class Player_Control : NetworkBehaviour
                 {
                     CmdFire();
                 }
-                
             }
         }
     }
@@ -270,6 +270,7 @@ public class Player_Control : NetworkBehaviour
         {
             StartCoroutine("Weapon_delay");
         }
+
         catch(Exception e)
         {
             Debug.LogError(e);

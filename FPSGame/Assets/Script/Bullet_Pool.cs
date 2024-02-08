@@ -26,7 +26,6 @@ public class Bullet_Pool : NetworkBehaviour
             Destroy(this);
         }
     }
-       
     private Queue<GameObject> bulletPool;
 
     public override void OnStartServer()

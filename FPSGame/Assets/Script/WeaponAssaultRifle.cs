@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -16,6 +17,13 @@ public class WeaponAssaultRifle : MonoBehaviour
     [Header("Weapon_Info")]
     [SerializeField]
     private Weapon_Info weaponInfo;
+
+
+    [Header("Audio Clips")]
+    [SerializeField]
+    private AudioClip audioClipTakeOutWeapon;   // 무기 장착 사운드
+
+    private AudioSource audioSource;            // 사운드 재생 컴포넌트
 
     public int CurrentAmmo => weaponInfo.currentAmmo;
     public int MaxAmmo => weaponInfo.maxAmmo;
@@ -35,6 +43,8 @@ public class WeaponAssaultRifle : MonoBehaviour
 
         canShoot = true;
         bc = Bullet_Control.bc_instance;
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     public float[] giveToPC()
@@ -68,6 +78,9 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void OnEnable()
     {
+        //무기 장착 사운드 재생
+        PlaySound(audioClipTakeOutWeapon);
+
         //무기가 활성화될 때 해당 무기의 탄약 수 정보를 갱신한다.
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
@@ -75,6 +88,13 @@ public class WeaponAssaultRifle : MonoBehaviour
         {
             onAmmoEvent.AddListener(OnAmmoCharged);
         }
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        audioSource.Stop();             // 기존에 재생중인 사운드를 정지하고,
+        audioSource.clip = clip;        // 새로운 사운드 clip으로 교체 후
+        audioSource.Play();             // 사운드 재생
     }
 
     private void OnDisable()

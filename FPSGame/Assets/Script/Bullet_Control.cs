@@ -80,9 +80,8 @@ public class Bullet_Control : NetworkBehaviour
         }
             
     }
-
     public void Bullet_Shoot()   //그냥 총의 rigidBody는 받아라 그냥;;
-    { 
+    {
         if (weapon == null)
         {
             Debug.LogError("Weapon is null!");
