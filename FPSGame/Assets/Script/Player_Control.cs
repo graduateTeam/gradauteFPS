@@ -5,7 +5,7 @@ using System;
 using UnityEditor.U2D.Sprites;
 
 /*
-* 괜히 GameManabger로 분리 시킬 생각하지마라 골치 아파진다.
+* 괜히 GameManager로 분리 시킬 생각하지마라 골치 아파진다.
 */
 
 public class Player_Control : NetworkBehaviour
