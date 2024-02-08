@@ -1,4 +1,5 @@
 using Mirror;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +20,31 @@ public class Bullet_Control : NetworkBehaviour
     private float attackDis;
     private float attackSpd;
 
+    public GameObject player;
+    public Rigidbody rb_gun;
+    public Rigidbody rb_player;
+    public Collider gunCollider;
+
+    public void getFromPC(GameObject player, Rigidbody rb_gun)
+    {
+        this.player = player;
+        this.rb_gun = rb_gun;
+
+        this.rb_player = player.GetComponent<Rigidbody>();
+        this.gunCollider = rb_player.GetComponent<Collider>();
+
+        GameObject gun = null;
+
+        Transform gunTransform = player.transform.Find("Weapon");
+        if (gunTransform != null)
+        {
+            gun = gunTransform.gameObject;
+        }
+
+        this.gunEndPos = rb_gun.transform.position + (rb_player.transform.forward * 0.75f);
+        this.gunEndPos += rb_player.transform.right * gun.transform.localPosition.x;
+    }
+
     public void get_Info(float attackDis, float attackSpd)
     {
         this.attackDis = attackDis;
@@ -30,7 +56,7 @@ public class Bullet_Control : NetworkBehaviour
         bp = Bullet_Pool.bp_instance;
         gm_instance = GameManager.gm_instance;
 
-        if (bc_instance == null )
+        if (bc_instance == null)
         {
             bc_instance = this;
         }
@@ -52,11 +78,10 @@ public class Bullet_Control : NetworkBehaviour
         {
             bp.ReturnBullet(this.gameObject);
         }
-            
+
     }
 
-
-    public void Bullet_Shoot(Rigidbody gun, Rigidbody player)
+    public void Bullet_Shoot()   //그냥 총의 rigidBody는 받아라 그냥;;
     {
         if (weapon == null)
         {
@@ -70,16 +95,15 @@ public class Bullet_Control : NetworkBehaviour
 
         GameObject bullet = bp.GetBullet();
 
-        Collider collider = gun.GetComponent<Collider>();
-        float gunLength = collider.bounds.size.z;
-        Vector3 gunEndPos = player.transform.position + player.transform.rotation * Vector3.forward * gunLength;
+        bullet.gameObject.name = "kjih's bullet";   //날라가는 순간 이름 변경(플레이어 + bullet) 누군가의 총알인지 파악
+        Debug.Log("Bullet name change: " + bullet.gameObject.name);
 
         RaycastHit hit;
         Vector3 targetPoint = Vector3.zero;
 
         //화면 정중앙 좌표
         Ray oldray = Camera.main.ViewportPointToRay(Vector2.one * 0.5f);
-        Ray ray = new Ray(player.transform.position, player.transform.rotation * oldray.direction);
+        Ray ray = new Ray(rb_player.transform.position, rb_player.transform.rotation * oldray.direction);
 
 
         if (Physics.Raycast(ray, out hit, 1000))
@@ -95,8 +119,7 @@ public class Bullet_Control : NetworkBehaviour
         Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
 
         //방향을 플레이어가 바라보는 방향으로 조정
-        Vector3 attackDirection = player.transform.forward;
-        
+        Vector3 attackDirection = rb_player.transform.forward;
 
         // 총알의 위치를 총의 끝으로 설정
         bullet.transform.position = gunEndPos;
@@ -111,5 +134,6 @@ public class Bullet_Control : NetworkBehaviour
         {
 
         }
+
     }
 }

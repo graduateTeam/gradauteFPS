@@ -3,9 +3,10 @@ using UnityEngine;
 using Mirror;
 using System;
 using UnityEditor.U2D.Sprites;
+using Unity.VisualScripting;
 
 /*
-* 괜히 GameManager로 분리 시킬 생각하지마라 골치 아파진다.
+* 괜히 GameManabger로 분리 시킬 생각하지마라 골치 아파진다.
 */
 
 public class Player_Control : NetworkBehaviour
@@ -54,7 +55,7 @@ public class Player_Control : NetworkBehaviour
     public float origin_recoilRecoverySpeed;
 
     public GameObject Attack_point; //혹시 피격을 위한 오브젝트
-    
+
     public Rigidbody rb_player; //플레이어의 리지드바디
 
     public Rigidbody rb_weapon; //무기의 리지드바디
@@ -108,23 +109,25 @@ public class Player_Control : NetworkBehaviour
 
         /*계속 덮어씌우는 것을 방지하기 위해 last를 관리 한다
         하지만 둘 다 0 일 떄, 값을 받아오지 않는 문제가 있기 때문에 0일 때는 무조건 받아오도록 한다.*/
-        if(recoilAmount != reciveFromWeapon[0] || (recoilAmount == 0 && reciveFromWeapon[0] == recoilAmount))
+        if (recoilAmount != reciveFromWeapon[0] || (recoilAmount == 0 && reciveFromWeapon[0] == recoilAmount))
         {
             recoilAmount = reciveFromWeapon[0];
             origin_recoilAmount = recoilAmount;
         }
-        if(recoilRecoverySpeed != reciveFromWeapon[1] || (recoilRecoverySpeed == 0 && reciveFromWeapon[1] == recoilRecoverySpeed))
+        if (recoilRecoverySpeed != reciveFromWeapon[1] || (recoilRecoverySpeed == 0 && reciveFromWeapon[1] == recoilRecoverySpeed))
         {
             recoilRecoverySpeed = reciveFromWeapon[1];
             origin_recoilRecoverySpeed = recoilRecoverySpeed;
         }
-        
+
         gm.HP_UI_Update(HP);
 
-        if(NetworkServer.active && !gm.Time_isMinus())
+        if (NetworkServer.active && !gm.Time_isMinus())
         {
             Time_spent();
         }
+
+        bc.getFromPC(Attack_point, rb_weapon);
     }
 
     public void Rebound()
@@ -138,10 +141,10 @@ public class Player_Control : NetworkBehaviour
         }
         else // 총을 쏘지 않는 상태라면
         {
-            if(currentRecoil != origin_recoilAmount)
+            if (currentRecoil != origin_recoilAmount)
                 currentRecoil = origin_recoilAmount; // 반동을 원래의 값으로 복구
 
-            if(recoilRecoverySpeed != origin_recoilRecoverySpeed)
+            if (recoilRecoverySpeed != origin_recoilRecoverySpeed)
                 recoilRecoverySpeed = origin_recoilRecoverySpeed;
         }
     }
@@ -176,13 +179,13 @@ public class Player_Control : NetworkBehaviour
                 // 최종 이동 벡터 계산.moveDirection에 이동 속도(speed)와 프레임 간 시간(Time.deltaTime) 곱함->일정한 속도로 움직임
                 vec = moveDirection * speed * Time.deltaTime;
 
-                if(!moving)
+                if (!moving)
                 {
                     moving = true;
                     recoilAmount *= 1.5f;
                     recoilRecoverySpeed *= 0.8f;
                 }
-                
+
                 if (isOwned)
                 {
                     rb_player.AddForce(vec, ForceMode.Impulse);
@@ -227,7 +230,7 @@ public class Player_Control : NetworkBehaviour
                 {
                     CmdFire();
                 }
-                
+
             }
         }
     }
@@ -267,7 +270,7 @@ public class Player_Control : NetworkBehaviour
         {
             StartCoroutine("Weapon_delay");
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.LogError(e);
         }
@@ -279,7 +282,7 @@ public class Player_Control : NetworkBehaviour
         alive = false;
         HP = 0;
         RpcplayerDies();
-        StartCoroutine("Respawn");
+        //StartCoroutine("Respawn");
     }
 
     [ClientRpc]
@@ -312,9 +315,14 @@ public class Player_Control : NetworkBehaviour
     IEnumerator Weapon_delay()
     {
         canFire = false;
-        bc.Bullet_Shoot(rb_weapon, rb_player);
-
-        Debug.Log(attackRate);
+        try
+        {
+            bc.Bullet_Shoot();
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
 
         yield return new WaitForSeconds(attackRate);  //임의값
         canFire = true;
@@ -328,7 +336,7 @@ public class Player_Control : NetworkBehaviour
 */
     private void Rotate()   //이렇게 하게되면 마우스에 따라 플레이어가 각도를 틀지만, 조금 더 자연스러운 움직임을 위해 머리 몸통을 나눠서 움직여야 할 듯?
     {
-        if(alive)
+        if (alive)
         {
             MouseX += Input.GetAxisRaw("Mouse X") * MouseSen * Time.deltaTime;
 
@@ -389,8 +397,6 @@ public class Player_Control : NetworkBehaviour
             {
                 isJump = false;
                 wasd = true;
-
-                Debug.Log("땅에 착지: " + isJump + " // " + wasd);
             }
         }
     }

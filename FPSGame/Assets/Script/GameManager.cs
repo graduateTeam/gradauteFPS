@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
 {
     public Image HP_bar;
     public TextMeshProUGUI HP_text;
-    public Image Respawn_bar;
+    //public Image Respawn_bar;
     public Image ImageAim;
 
     public static GameManager gm_instance;
@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if(gm_instance == null)
+        if (gm_instance == null)
         {
             gm_instance = this;
         }
@@ -50,9 +50,16 @@ public class GameManager : MonoBehaviour
 
     public void AimPos(Vector3 pos)
     {
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(pos);
-        Debug.Log("screenPos.y: " + screenPos.y);
-        ImageAim.transform.position = new Vector3(ImageAim.transform.position.x, screenPos.y, ImageAim.transform.position.z);
+        Vector3 viewportPos = Camera.main.WorldToViewportPoint(pos);
+        if (!(viewportPos.z > 0 && viewportPos.x >= 0) && !(viewportPos.x <= 1 && viewportPos.y >= 0 && viewportPos.y <= 1))
+        {
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(pos);
+            ImageAim.transform.position = new Vector3(screenPos.x, screenPos.y, ImageAim.transform.position.z);
+            Vector3 cameraPos = Camera.main.transform.position;
+
+            Camera.main.transform.position = new Vector3(cameraPos.x, ImageAim.transform.position.y, cameraPos.z);
+
+        }
     }
 
 
@@ -71,15 +78,15 @@ public class GameManager : MonoBehaviour
         HP_bar.fillAmount = hp / 100f;
         HP_text.text = string.Format("{0} / 100", hp);
 
-        if(hp <= 0)
+        /*if(hp <= 0)
             Respawn_bar.gameObject.SetActive(true);
         else
-            Respawn_bar.gameObject.SetActive(false);
+            Respawn_bar.gameObject.SetActive(false);*/
     }
 
     public void Respawn_bar_Update(float time, float fullTime)
     {
-        Respawn_bar.fillAmount = time / fullTime;   
+        //Respawn_bar.fillAmount = time / fullTime;   
     }
 
     public void UI_Init()
@@ -103,12 +110,12 @@ public class GameManager : MonoBehaviour
         minute = Mathf.Floor(minute);
         second = Mathf.Floor(second);
 
-        return new float[] {minute, second};
+        return new float[] { minute, second };
     }
 
     public int[] Who_kill(string team) //누군가 죽이면 킬 수 올리기
     {
-        if(team.Equals("red"))
+        if (team.Equals("red"))
         {
             Red_kill += 1;
         }
@@ -117,12 +124,12 @@ public class GameManager : MonoBehaviour
             Blue_kill += 1;
         }
 
-        return new int[] {Red_kill, Blue_kill};
+        return new int[] { Red_kill, Blue_kill };
     }
 
     public Boolean Time_isMinus()
     {
-        if (gameTime < 1) 
+        if (gameTime < 1)
             return true;
         else
             return false;
