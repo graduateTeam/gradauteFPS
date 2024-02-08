@@ -25,7 +25,7 @@ public class Bullet_Control : NetworkBehaviour
     public Rigidbody rb_player;
     public Collider gunCollider;
 
-    public void getFromPC(GameObject player, Rigidbody rb_gun)
+    public void getFromPC(GameObject player, Rigidbody rb_gun, MeshCollider mesh_gun)
     {
         this.player = player;
         this.rb_gun = rb_gun;
@@ -41,8 +41,10 @@ public class Bullet_Control : NetworkBehaviour
             gun = gunTransform.gameObject;
         }
 
-        this.gunEndPos = rb_gun.transform.position + (rb_player.transform.forward *0.75f);
+        this.gunEndPos = mesh_gun.transform.position + (rb_player.transform.forward *0.75f);
         this.gunEndPos += rb_player.transform.right * gun.transform.localPosition.x;
+        this.gunEndPos.y -= 0.3f;   //총구 끝에서 발사되는 것 같이 보이게 y좌표 인위적 하강
+
     }
 
     public void get_Info(float attackDis, float attackSpd)

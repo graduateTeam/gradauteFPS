@@ -60,6 +60,8 @@ public class Player_Control : NetworkBehaviour
 
     public Rigidbody rb_weapon; //무기의 리지드바디
 
+    public MeshCollider mesh_weapon;
+
     public GameObject Feet;
 
     public Bullet_Control bc;
@@ -129,7 +131,7 @@ public class Player_Control : NetworkBehaviour
             Time_spent();
         }
 
-        bc.getFromPC(Attack_point, rb_weapon);
+        bc.getFromPC(Attack_point, rb_weapon, mesh_weapon);
     }
 
     public void Rebound()
@@ -368,6 +370,7 @@ public class Player_Control : NetworkBehaviour
     {
         rb_player = Attack_Object.GetComponent<Rigidbody>();
         rb_weapon = Attack_Object.GetComponent<Rigidbody>();
+        mesh_weapon = Attack_Object.GetComponentInChildren<MeshCollider>();
 
         if (rb_player == null)
         {
