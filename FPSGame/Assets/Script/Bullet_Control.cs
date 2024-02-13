@@ -21,35 +21,49 @@ public class Bullet_Control : NetworkBehaviour
     private float attackSpd;
 
     public GameObject player;
+    public GameObject Head;
     public Rigidbody rb_player;
+    public Rigidbody rb_weapon;
     public Collider gunCollider;
 
-    public void getFromPC(GameObject player, MeshCollider mesh_gun)
+    public void getFromPC(GameObject player)
     {
         this.player = player;
+        
+        foreach(Transform child in this.player.transform)
+        {
+            if(child.gameObject.name == "Head")
+            {
+                Head = child.gameObject;
+            }
+        }
 
         this.rb_player = player.GetComponent<Rigidbody>();
         this.gunCollider = rb_player.GetComponent<Collider>();
 
-        GameObject gun = null;
-
-        Transform gunTransform = player.transform.Find("Weapon");
-        if (gunTransform != null)
+        foreach(Transform child in player.transform)
         {
-            gun = gunTransform.gameObject;
+            if(child.tag == "Weapon")
+            {
+                rb_weapon = child.GetComponentInChildren<Rigidbody>();
+
+                float[] receive = weapon.Gun_Info();
+
+                this.attackDis = receive[0];
+                this.attackSpd = receive[1];
+                
+                break;
+            }
         }
 
-        this.gunEndPos = mesh_gun.transform.position + (rb_player.transform.forward *0.75f);
-        this.gunEndPos += rb_player.transform.right * gun.transform.localPosition.x;
-        this.gunEndPos.y -= 0.3f;   //총구 끝에서 발사되는 것 같이 보이게 y좌표 인위적 하강
+        Renderer renderer = rb_weapon.GetComponent<Renderer>();
+        float localZOffset = rb_weapon.transform.InverseTransformPoint(renderer.bounds.center).z;
 
+        this.gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
+
+        Debug.Log("총알 위치: " + this.gunEndPos);
     }
 
-    public void get_Info(float attackDis, float attackSpd)
-    {
-        this.attackDis = attackDis;
-        this.attackSpd = attackSpd;
-    }
 
     void Awake()
     {
@@ -76,6 +90,8 @@ public class Bullet_Control : NetworkBehaviour
     {
         if (collision.gameObject.tag != "bullet" && collision.gameObject.name != "Weapon")    //총알끼리 부딪혀서 사라지는 경우를 배제
         {
+            Debug.Log("총알의 착탄: " + this.transform.position + " // " + collision.gameObject.name);
+
             bp.ReturnBullet(this.gameObject);
         }
             
@@ -102,7 +118,7 @@ public class Bullet_Control : NetworkBehaviour
 
         //화면 정중앙 좌표
         Ray oldray = Camera.main.ViewportPointToRay(Vector2.one * 0.5f);
-        Ray ray = new Ray(rb_player.transform.position, rb_player.transform.rotation * oldray.direction);
+        Ray ray = new Ray(rb_weapon.transform.position, Head.transform.rotation * oldray.direction);
 
 
         if (Physics.Raycast(ray, out hit, 1000))
@@ -118,7 +134,7 @@ public class Bullet_Control : NetworkBehaviour
         Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
 
         //방향을 플레이어가 바라보는 방향으로 조정
-        Vector3 attackDirection = rb_player.transform.forward;
+        Vector3 attackDirection = Head.transform.forward;
 
         // 총알의 위치를 총의 끝으로 설정
         bullet.transform.position = gunEndPos;

@@ -4,6 +4,7 @@ using Mirror;
 using System;
 using UnityEditor.U2D.Sprites;
 using Unity.VisualScripting;
+using System.Xml.Linq;
 
 /*
 * 괜히 GameManabger로 분리 시킬 생각하지마라 골치 아파진다.
@@ -44,6 +45,12 @@ public class Player_Control : NetworkBehaviour
     [SyncVar]
     public float attackRate;    //총 사이 간격
 
+    [SyncVar]
+    public GameObject Head;
+
+    [SyncVar]
+    public GameObject Arm;
+
     public WeaponAssaultRifle AssaultRifle;
 
     public float currentRecoil; // 현재 반동 상태
@@ -59,8 +66,6 @@ public class Player_Control : NetworkBehaviour
     public Rigidbody rb_player; //플레이어의 리지드바디
 
     public Rigidbody rb_weapon; //무기의 리지드바디
-
-    public MeshCollider mesh_weapon;
 
     public GameObject Feet;
 
@@ -131,7 +136,7 @@ public class Player_Control : NetworkBehaviour
             Time_spent();
         }
 
-        bc.getFromPC(Attack_point, mesh_weapon);
+        bc.getFromPC(Attack_point);
     }
 
     public void Rebound()
@@ -177,7 +182,8 @@ public class Player_Control : NetworkBehaviour
                    - transform.right * Horizontal_move: 수평 입력에 따른 이동 벡터
                    - new Vector3(transform.forward.x, 0, transform.forward.z) * Vertical_move: 수직 입력에 따른 이동 벡터, y 성분 0으로 설정하여 수평적으로만 움직임
                    - 두 이동 벡터 더한 후 .normalized로 크기 1로 만듦 -> 대각선 이동 시 속도 일정하게 유지 */
-                Vector3 moveDirection = (transform.right * Horizontal_move + new Vector3(transform.forward.x, 0, transform.forward.z) * Vertical_move).normalized;
+                Vector3 moveDirection = (transform.right * Horizontal_move + new Vector3(Head.transform.forward.x, 0, Head.transform.forward.z) * Vertical_move).normalized;
+
 
 
                 // 최종 이동 벡터 계산.moveDirection에 이동 속도(speed)와 프레임 간 시간(Time.deltaTime) 곱함->일정한 속도로 움직임
@@ -345,11 +351,17 @@ public class Player_Control : NetworkBehaviour
 
             MouseY += Input.GetAxisRaw("Mouse Y") * MouseSen * Time.deltaTime;
 
-            MouseY = Mathf.Clamp(MouseY, -90f, 90f);    //위 아래 고개 최대 범위 -90 ~ 90
+            MouseY = Mathf.Clamp(MouseY, -70f, 70f);    //위 아래 고개 최대 범위 -70 ~ 70
         }
 
         Quaternion quat = Quaternion.Euler(new Vector3(-MouseY, MouseX, 0));
-        transform.rotation
+
+        Body_Rotate(quat, Head);
+        Body_Rotate(quat, Arm);
+    }
+    private void Body_Rotate(Quaternion quat , GameObject g_object)
+    {
+        g_object.transform.rotation
             = Quaternion.Slerp(transform.rotation, quat, Time.fixedDeltaTime * MouseSen);
     }
 
@@ -370,7 +382,6 @@ public class Player_Control : NetworkBehaviour
     {
         rb_player = Attack_Object.GetComponent<Rigidbody>();
         rb_weapon = Attack_Object.GetComponent<Rigidbody>();
-        mesh_weapon = Attack_Object.GetComponentInChildren<MeshCollider>();
 
         if (rb_player == null)
         {

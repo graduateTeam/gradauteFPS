@@ -58,9 +58,10 @@ public class WeaponAssaultRifle : MonoBehaviour
         return weaponInfo.attackRate;
     }
 
-    private void Start()
+    public float[] Gun_Info()
     {
-        bc.get_Info(weaponInfo.attackDistance, weaponInfo.bulletSpeed);
+        float[] temp = {weaponInfo.attackDistance, weaponInfo.bulletSpeed};
+        return temp;
     }
 
     private void Update()
@@ -135,6 +136,8 @@ public class WeaponAssaultRifle : MonoBehaviour
     {
         isReload = true;
         canShoot = false;
+
+        Debug.Log("재장전 중!");
 
         yield return new WaitForSeconds(2f); // 2초 동안 대기
 
