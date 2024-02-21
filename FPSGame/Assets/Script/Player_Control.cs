@@ -139,7 +139,7 @@ public class Player_Control : NetworkBehaviour
         bc.getFromPC(Attack_point);
     }
 
-    public void Rebound()
+    public void Rebound()   //반동함수
     {
         // 반동을 부드럽게 적용한다.
         if (AssaultRifle.canShoot && !canFire)  //시간에 따른다
@@ -165,7 +165,7 @@ public class Player_Control : NetworkBehaviour
         return Mathf.Sqrt(2 * 2 * Physics.gravity.magnitude);
     }
 
-    private void player_movement()
+    private void player_movement()  //플레이어 움직임 함수
     {
         if (!isLocalPlayer) return;
 
@@ -256,8 +256,8 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수
+    [Command]
+    public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수 피 깎는 함수
     {
         CmdReduceHP(damage);
     }

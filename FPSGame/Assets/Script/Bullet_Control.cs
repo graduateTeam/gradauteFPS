@@ -26,7 +26,7 @@ public class Bullet_Control : NetworkBehaviour
     public Rigidbody rb_weapon;
     public Collider gunCollider;
 
-    public void getFromPC(GameObject player)
+    public void getFromPC(GameObject player)    //값을 받아와 적절한 위치 선정까지
     {
         this.player = player;
         
@@ -96,7 +96,7 @@ public class Bullet_Control : NetworkBehaviour
         }
             
     }
-    public void Bullet_Shoot()   //그냥 총의 rigidBody는 받아라 그냥;;
+    public void Bullet_Shoot()   //총알 발사로직
     {
         if (weapon == null)
         {
