@@ -7,43 +7,43 @@ using Unity.VisualScripting;
 using System.Xml.Linq;
 
 /*
-* ±¦È÷ GameManabger·Î ºÐ¸® ½ÃÅ³ »ý°¢ÇÏÁö¸¶¶ó °ñÄ¡ ¾ÆÆÄÁø´Ù.
+* ï¿½ï¿½ï¿½ï¿½ GameManabgerï¿½ï¿½ ï¿½Ð¸ï¿½ ï¿½ï¿½Å³ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 */
 
 public class Player_Control : NetworkBehaviour
 {
     // Start is called before the first frame update
-    public bool alive; //ÇÃ·¹ÀÌ¾îÀÇ »ýÁ¸ ¿©ºÎ ÀÌ°Ô ²¨Á®ÀÖÀ¸¸é ÇÃ·¹ÀÌ¾îÀÇ Á¶ÀÛ±ÇÇÑÀ» »¯¾î¿À°í, ¸®½ºÆù ÈÄ¿¡ ´Ù½Ã ºÎ¿©ÇØÁÙ °ÍÀÓ
-    public bool isJump; //¹«ÇÑ Á¡ÇÁ ¹æÁö¿ë Á¡ÇÁ¸¦ ÇÏ°í ³­ µÚ ¶¥¿¡ ÂøÁöÇØ¾ß ´Ù½Ã false·Î ¸¸µé¾îÁÙ°ÅÀÓ
-    public bool wasd; //Á¡ÇÁ ½Ã wasd ¸·±â
+    public bool alive; //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û±ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ä¿ï¿½ ï¿½Ù½ï¿½ ï¿½Î¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public bool isJump; //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï°ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Ù½ï¿½ falseï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù°ï¿½ï¿½ï¿½
+    public bool wasd; //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ wasd ï¿½ï¿½ï¿½ï¿½
 
     public float MouseX;
-    public float MouseY;    //¸¶¿ì½º¿¡ µû¸¥ ¸öÀÇ ¿òÁ÷ÀÓ
+    public float MouseY;    //ï¿½ï¿½ï¿½ì½ºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     private Vector3 jumpDirection;
 
     [SyncVar]
     public bool moving;
 
     [SyncVar]
-    public int HP;  //ÇÃ·¹ÀÌ¾îÀÇ Ã¼·Â
+    public int HP;  //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ Ã¼ï¿½ï¿½
 
     [SyncVar]
-    public float lim_Speed; //ÃÖ´ë ¼Ó·Â
+    public float lim_Speed; //ï¿½Ö´ï¿½ ï¿½Ó·ï¿½
 
     [SyncVar]
-    public float jumpPower; //Á¡ÇÁ·Â
+    public float jumpPower; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     [SyncVar]
-    public float speed; //ÇÃ·¹ÀÌ¾îÀÇ ¼Óµµ
+    public float speed; //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½Óµï¿½
 
     [SyncVar]
     public float MouseSen;
 
     [SyncVar]
-    public float Respawn_Time;    //¸®½ºÆù ½Ã°£
+    public float Respawn_Time;    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
 
     [SyncVar]
-    public float attackRate;    //ÃÑ »çÀÌ °£°Ý
+    public float attackRate;    //ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     [SyncVar]
     public GameObject Head;
@@ -53,19 +53,19 @@ public class Player_Control : NetworkBehaviour
 
     public WeaponAssaultRifle AssaultRifle;
 
-    public float currentRecoil; // ÇöÀç ¹Ýµ¿ »óÅÂ
+    public float currentRecoil; // ï¿½ï¿½ï¿½ï¿½ ï¿½Ýµï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    public float recoilAmount;  // ¹Ýµ¿ÀÇ ¾ç
+    public float recoilAmount;  // ï¿½Ýµï¿½ï¿½ï¿½ ï¿½ï¿½
     public float origin_recoilAmount;
 
-    public float recoilRecoverySpeed;   // ¹Ýµ¿ È¸º¹ ¼Óµµ
+    public float recoilRecoverySpeed;   // ï¿½Ýµï¿½ È¸ï¿½ï¿½ ï¿½Óµï¿½
     public float origin_recoilRecoverySpeed;
 
-    public GameObject Attack_point; //È¤½Ã ÇÇ°ÝÀ» À§ÇÑ ¿ÀºêÁ§Æ®
+    public GameObject Attack_point; //È¤ï¿½ï¿½ ï¿½Ç°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 
-    public Rigidbody rb_player; //ÇÃ·¹ÀÌ¾îÀÇ ¸®Áöµå¹Ùµð
+    public Rigidbody rb_player; //ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ùµï¿½
 
-    public Rigidbody rb_weapon; //¹«±âÀÇ ¸®Áöµå¹Ùµð
+    public Rigidbody rb_weapon; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ùµï¿½
 
     public GameObject Feet;
 
@@ -96,13 +96,13 @@ public class Player_Control : NetworkBehaviour
         Rebound();
 
         RaycastHit hit;
-        // ¹ß À§Ä¡¿¡¼­ ¾ÕÂÊÀ¸·Î Ray¸¦ ½î±â
+        // ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Rayï¿½ï¿½ ï¿½ï¿½ï¿½
         if (Physics.Raycast(Feet.transform.position, Feet.transform.forward, out hit, 1f))
         {
-            // Àå¾Ö¹°ÀÇ ³ôÀÌ Ã¼Å©
-            if (hit.transform.position.y >= (Feet.transform.position.y + 2) && hit.transform.position.y < (Feet.transform.position.y + 1)) // '2'´Â ³ÑÀ» ¼ö ÀÖ´Â ÃÖ´ë ³ôÀÌ
+            // ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¼Å©
+            if (hit.transform.position.y >= (Feet.transform.position.y + 2) && hit.transform.position.y < (Feet.transform.position.y + 1)) // '2'ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½
             {
-                //Àå¾Ö¹° ³Ñ±â
+                //ï¿½ï¿½Ö¹ï¿½ ï¿½Ñ±ï¿½
                 Vector3 jumpForce = new Vector3(0, CalculateJumpVerticalSpeed(), 0);
                 rb_player.AddForce(jumpForce, ForceMode.Impulse);
             }
@@ -114,24 +114,24 @@ public class Player_Control : NetworkBehaviour
     {
         float[] reciveFromWeapon = AssaultRifle.giveToPC();
 
-        /*°è¼Ó µ¤¾î¾º¿ì´Â °ÍÀ» ¹æÁöÇÏ±â À§ÇØ last¸¦ °ü¸® ÇÑ´Ù
-        ÇÏÁö¸¸ µÑ ´Ù 0 ÀÏ ‹š, °ªÀ» ¹Þ¾Æ¿ÀÁö ¾Ê´Â ¹®Á¦°¡ ÀÖ±â ¶§¹®¿¡ 0ÀÏ ¶§´Â ¹«Á¶°Ç ¹Þ¾Æ¿Àµµ·Ï ÇÑ´Ù.*/
+        /*ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½î¾ºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ lastï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ´ï¿½
+        ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ 0 ï¿½ï¿½ ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¿ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¾Æ¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ´ï¿½.*/
 
-        if(recoilAmount != reciveFromWeapon[0] || (recoilAmount == 0 && reciveFromWeapon[0] == recoilAmount))
+        if (recoilAmount != reciveFromWeapon[0] || (recoilAmount == 0 && reciveFromWeapon[0] == recoilAmount))
         {
             recoilAmount = reciveFromWeapon[0];
             origin_recoilAmount = recoilAmount;
         }
 
-        if(recoilRecoverySpeed != reciveFromWeapon[1] || (recoilRecoverySpeed == 0 && reciveFromWeapon[1] == recoilRecoverySpeed))
+        if (recoilRecoverySpeed != reciveFromWeapon[1] || (recoilRecoverySpeed == 0 && reciveFromWeapon[1] == recoilRecoverySpeed))
         {
             recoilRecoverySpeed = reciveFromWeapon[1];
             origin_recoilRecoverySpeed = recoilRecoverySpeed;
         }
-        
+
         gm.HP_UI_Update(HP);
 
-        if(NetworkServer.active && !gm.Time_isMinus())
+        if (NetworkServer.active && !gm.Time_isMinus())
         {
             Time_spent();
         }
@@ -141,27 +141,27 @@ public class Player_Control : NetworkBehaviour
 
     public void Rebound()
     {
-        // ¹Ýµ¿À» ºÎµå·´°Ô Àû¿ëÇÑ´Ù.
-        if (AssaultRifle.canShoot && !canFire)  //½Ã°£¿¡ µû¸¥´Ù
+        // ï¿½Ýµï¿½ï¿½ï¿½ ï¿½Îµå·´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
+        if (AssaultRifle.canShoot && !canFire)  //ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         {
-            MouseY += currentRecoil * Time.deltaTime; // ½Ã°£¿¡ µû¸¥ ¹Ýµ¿ Àû¿ë
-            currentRecoil -= recoilRecoverySpeed * Time.deltaTime; // ½Ã°£¿¡ µû¸¥ ¹Ýµ¿ °¨¼Ò
-            currentRecoil = Mathf.Max(currentRecoil, recoilAmount * 0.9f); // ¹Ýµ¿ÀÌ 0º¸´Ù ÀÛ¾ÆÁöÁö ¾Êµµ·Ï ÇÔ
+            MouseY += currentRecoil * Time.deltaTime; // ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ýµï¿½ ï¿½ï¿½ï¿½ï¿½
+            currentRecoil -= recoilRecoverySpeed * Time.deltaTime; // ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ýµï¿½ ï¿½ï¿½ï¿½ï¿½
+            currentRecoil = Mathf.Max(currentRecoil, recoilAmount * 0.9f); // ï¿½Ýµï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Û¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Êµï¿½ï¿½ï¿½ ï¿½ï¿½
         }
-        else // ÃÑÀ» ½îÁö ¾Ê´Â »óÅÂ¶ó¸é
+        else // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ï¿½ï¿½ï¿½Â¶ï¿½ï¿½
         {
-            if(currentRecoil != origin_recoilAmount)
-                currentRecoil = origin_recoilAmount; // ¹Ýµ¿À» ¿ø·¡ÀÇ °ªÀ¸·Î º¹±¸
+            if (currentRecoil != origin_recoilAmount)
+                currentRecoil = origin_recoilAmount; // ï¿½Ýµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-            if(recoilRecoverySpeed != origin_recoilRecoverySpeed)
+            if (recoilRecoverySpeed != origin_recoilRecoverySpeed)
                 recoilRecoverySpeed = origin_recoilRecoverySpeed;
         }
     }
 
-    // Á¡ÇÁ ¼Óµµ °è»ê
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½
     float CalculateJumpVerticalSpeed()
     {
-        // ¹°¸®½ÄÀ¸·Î Á¡ÇÁ ³ôÀÌ¸¦ °è»êÇÕ´Ï´Ù (³ôÀÌ = 0.5 * Áß·Â * Á¡ÇÁ½Ã°£^2)
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½ (ï¿½ï¿½ï¿½ï¿½ = 0.5 * ï¿½ß·ï¿½ * ï¿½ï¿½ï¿½ï¿½ï¿½Ã°ï¿½^2)
         return Mathf.Sqrt(2 * 2 * Physics.gravity.magnitude);
     }
 
@@ -178,18 +178,19 @@ public class Player_Control : NetworkBehaviour
                 float Horizontal_move = Input.GetAxis("Horizontal");
                 float Vertical_move = Input.GetAxis("Vertical");
 
-                /* ÀÌµ¿ ¹æÇâ °è»ê
-                   - transform.right * Horizontal_move: ¼öÆò ÀÔ·Â¿¡ µû¸¥ ÀÌµ¿ º¤ÅÍ
-                   - new Vector3(transform.forward.x, 0, transform.forward.z) * Vertical_move: ¼öÁ÷ ÀÔ·Â¿¡ µû¸¥ ÀÌµ¿ º¤ÅÍ, y ¼ººÐ 0À¸·Î ¼³Á¤ÇÏ¿© ¼öÆòÀûÀ¸·Î¸¸ ¿òÁ÷ÀÓ
-                   - µÎ ÀÌµ¿ º¤ÅÍ ´õÇÑ ÈÄ .normalized·Î Å©±â 1·Î ¸¸µê -> ´ë°¢¼± ÀÌµ¿ ½Ã ¼Óµµ ÀÏÁ¤ÇÏ°Ô À¯Áö */
+                /* ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+                   - transform.right * Horizontal_move: ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½
+                   - new Vector3(transform.forward.x, 0, transform.forward.z) * Vertical_move: ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·Â¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½, y ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                   - ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ .normalizedï¿½ï¿½ Å©ï¿½ï¿½ 1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -> ï¿½ë°¢ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ */
                 Vector3 moveDirection = (transform.right * Horizontal_move + new Vector3(Head.transform.forward.x, 0, Head.transform.forward.z) * Vertical_move).normalized;
 
 
 
-                // ÃÖÁ¾ ÀÌµ¿ º¤ÅÍ °è»ê.moveDirection¿¡ ÀÌµ¿ ¼Óµµ(speed)¿Í ÇÁ·¹ÀÓ °£ ½Ã°£(Time.deltaTime) °öÇÔ->ÀÏÁ¤ÇÑ ¼Óµµ·Î ¿òÁ÷ÀÓ
+
+                // ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½.moveDirectionï¿½ï¿½ ï¿½Ìµï¿½ ï¿½Óµï¿½(speed)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã°ï¿½(Time.deltaTime) ï¿½ï¿½ï¿½ï¿½->ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 vec = moveDirection * speed * Time.deltaTime;
 
-                if(!moving)
+                if (!moving)
                 {
                     moving = true;
                     recoilAmount *= 1.5f;
@@ -210,10 +211,10 @@ public class Player_Control : NetworkBehaviour
 
             if (!isJump && Input.GetButton("Jump"))
             {
-                isJump = true; //2Áß Á¡ÇÁ ¸·±â
-                wasd = false;   //Á¡ÇÁ Áß ¿òÁ÷ÀÓ ¸·±â
+                isJump = true; //2ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+                wasd = false;   //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-                // ¿ùµå ÁÂÇ¥¸¦ ±âÁØÀ¸·Î Á¡ÇÁ º¤ÅÍ ¼³Á¤
+                // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 vec = new Vector3(jumpDirection.x, jumpPower, jumpDirection.z) * speed * Time.deltaTime;
 
                 if (!moving)
@@ -257,7 +258,7 @@ public class Player_Control : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void Hitted_Bullet(int damage)   //CmdReduceHPÀÇ ¿ÜºÎÁ¢±ÙÀ» À§ÇÑ ÇÔ¼ö
+    public void Hitted_Bullet(int damage)   //CmdReduceHPï¿½ï¿½ ï¿½Üºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
     {
         CmdReduceHP(damage);
     }
@@ -271,15 +272,15 @@ public class Player_Control : NetworkBehaviour
             HP = 0;
     }
 
-    [Command]   //Command°¡ ÀÖÀ¸¸é Å¬¶óÀÌ¾ðÆ®¿¡¼­ È£ÃâÇÏÁö¸¸ Ã³¸®´Â ¼­¹ö(Mirror)¿¡¼­ ÇÔ
-    void CmdFire()  //ÃÑ¾Ë ¹ß»ç ¼­¹ö¿¡¼­ÀÇ Ã³¸®
+    [Command]   //Commandï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(Mirror)ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+    void CmdFire()  //ï¿½Ñ¾ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
     {
         try
         {
             StartCoroutine("Weapon_delay");
         }
 
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.LogError(e);
         }
@@ -297,7 +298,7 @@ public class Player_Control : NetworkBehaviour
     [ClientRpc]
     void RpcplayerDies()
     {
-        //Á×´Â ¼Ò¸® ¹× ¾Ö´Ï¸ÞÀÌ¼Ç
+        //ï¿½×´ï¿½ ï¿½Ò¸ï¿½ ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½
     }
 
     /*IEnumerator Respawn()
@@ -310,7 +311,7 @@ public class Player_Control : NetworkBehaviour
             elapsedTime = Time.time - startTime;
             gm.Respawn_bar_Update(elapsedTime, Respawn_Time);
 
-            yield return null;  // ´ÙÀ½ ÇÁ·¹ÀÓ±îÁö ´ë±âÇÕ´Ï´Ù.
+            yield return null;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
         }
 
         if (isServer)
@@ -333,25 +334,25 @@ public class Player_Control : NetworkBehaviour
             Debug.Log(e);
         }
 
-        yield return new WaitForSeconds(attackRate);  //ÀÓÀÇ°ª
+        yield return new WaitForSeconds(attackRate);  //ï¿½ï¿½ï¿½Ç°ï¿½
         canFire = true;
     }
 
-    /*[ClientRpc] //¸ðµç Å¬¶óÀÌ¾ðÆ®¿¡¼­ ¼­¹öÀÇ ¸í·ÉÀ» ¹Þ°í ÇØ´ç ÇÃ·¹ÀÌ¾î¸¦ ºÎÈ°·Î Ã³¸®
+    /*[ClientRpc] //ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ°ï¿½ ï¿½Ø´ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î¸¦ ï¿½ï¿½È°ï¿½ï¿½ Ã³ï¿½ï¿½
     void RpcRespawn()
     {
-        //ºÎÈ° ¹× ÁÂÇ¥ º¯°æ
+        //ï¿½ï¿½È° ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½
     }
 */
-    private void Rotate()   //ÀÌ·¸°Ô ÇÏ°ÔµÇ¸é ¸¶¿ì½º¿¡ µû¶ó ÇÃ·¹ÀÌ¾î°¡ °¢µµ¸¦ Æ²Áö¸¸, Á¶±Ý ´õ ÀÚ¿¬½º·¯¿î ¿òÁ÷ÀÓÀ» À§ÇØ ¸Ó¸® ¸öÅëÀ» ³ª´²¼­ ¿òÁ÷¿©¾ß ÇÒ µí?
+    private void Rotate()   //ï¿½Ì·ï¿½ï¿½ï¿½ ï¿½Ï°ÔµÇ¸ï¿½ ï¿½ï¿½ï¿½ì½ºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Æ²ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ú¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ó¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½?
     {
-        if(alive)
+        if (alive)
         {
             MouseX += Input.GetAxisRaw("Mouse X") * MouseSen * Time.deltaTime;
 
             MouseY += Input.GetAxisRaw("Mouse Y") * MouseSen * Time.deltaTime;
 
-            MouseY = Mathf.Clamp(MouseY, -70f, 70f);    //À§ ¾Æ·¡ °í°³ ÃÖ´ë ¹üÀ§ -70 ~ 70
+            MouseY = Mathf.Clamp(MouseY, -70f, 70f);    //ï¿½ï¿½ ï¿½Æ·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ -70 ~ 70
         }
 
         Quaternion quat = Quaternion.Euler(new Vector3(-MouseY, MouseX, 0));
@@ -366,14 +367,14 @@ public class Player_Control : NetworkBehaviour
     }
 
     [Server]
-    private void SpawnPlayer()  //¼­¹öÀûÀ¸·Î °¢Á¾ ÇÃ·¹ÀÌ¾î ¼öÄ¡µéÀÌ ÇÒ´çµÇ¾î¾ß ÇÑ´Ù.
+    private void SpawnPlayer()  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½Ç¾ï¿½ï¿½ ï¿½Ñ´ï¿½.
     {
         Vector3 Spawn_Point = new Vector3(0, 20, 0);
         Attack_point.transform.position = Spawn_Point;
         Attack_point.transform.Translate(55f, 0, -0.6140758f);
         Attack_point.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
-        NetworkServer.Spawn(Attack_point); //¸Ç À§ÀÇ ¾îÅÃ Æ÷ÀÎÆ®(ºÎ¸ð)¸¸ ¼ÒÈ¯ÇØ¾ß ºÐ½ÅÀÌ ¾È »ý±ä´Ù.
+        NetworkServer.Spawn(Attack_point); //ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®(ï¿½Î¸ï¿½)ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ø¾ï¿½ ï¿½Ð½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½.
 
         Game_Start(Attack_point);
     }
@@ -393,20 +394,31 @@ public class Player_Control : NetworkBehaviour
             Debug.Log("rb_weapon is null");
         }
 
-        bc = Bullet_Control.bc_instance;    //NetworkBehavior¸¦ »ó¼Ó¹Þ°Ô µÈ´Ù¸é Åë»ó new ~~ ÀÌ·± ½ÄÀÇ ÀÎ½ºÅÏ½ºÈ­´Â ºÒ°¡´ÉÇÏ°Ô µÈ´Ù.
+        bc = Bullet_Control.bc_instance;    //NetworkBehaviorï¿½ï¿½ ï¿½ï¿½Ó¹Þ°ï¿½ ï¿½È´Ù¸ï¿½ ï¿½ï¿½ï¿½ new ~~ ï¿½Ì·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î½ï¿½ï¿½Ï½ï¿½È­ï¿½ï¿½ ï¿½Ò°ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½È´ï¿½.
 
         bc.weapon = Attack_Object.GetComponentInChildren<WeaponAssaultRifle>();
 
         gm = GameManager.gm_instance;
 
-        gm.UI_Init();   //UI ÃÊ±âÈ­
+        gm.UI_Init();   //UI ï¿½Ê±ï¿½È­
 
         moving = false;
+
+        foreach (Transform child in Attack_point.transform)
+        {
+            if (child.tag == "MainCamera")
+            {
+                Cam = child.GetComponent<Camera>();
+
+                Debug.Log("Camera Found! : " + Cam);
+                break;
+            }
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (alive)   //¶¥ È¤Àº ÁöÇüÁö¹°¿¡ ´Ù½Ã ´êÀ¸¸é Á¡ÇÁ ´Ù½Ã È°¼ºÈ­
+        if (alive)   //ï¿½ï¿½ È¤ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ù½ï¿½ È°ï¿½ï¿½È­
         {
             if (collision.gameObject.tag == "land")
             {
@@ -420,11 +432,11 @@ public class Player_Control : NetworkBehaviour
     {
         if (other.gameObject.tag == "bullet")
         {
-            Debug.Log("ÇÃ·¹ÀÌ¾îÀÇ ÇÇ°Ý");
-            Vector3 player_pos = transform.position;  //ÇÃ·¹ÀÌ¾î°¡ ¼­ ÀÖ´Â À§Ä¡
+            Debug.Log("ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½Ç°ï¿½");
+            Vector3 player_pos = transform.position;  //ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½Ä¡
             Vector3 bullet_pos = other.transform.position;
 
-            Hitted_Bullet(damage_Reducing(player_pos, bullet_pos, 10));   //ÀÓÀÇ·Î ´ë¹ÌÁö 10ÀÌ¶ó°í ÇÑ °Í ½ºÅ©¸³Æ®¿¡ ´ë¹ÌÁö°¡ Á¤ÇØÁö¸é ±× ´ë¹ÌÁö·Î ¹Ù²Ü °Í
+            Hitted_Bullet(damage_Reducing(player_pos, bullet_pos, 10));   //ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ 10ï¿½Ì¶ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Å©ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½ ï¿½ï¿½
         }
     }
 
@@ -432,18 +444,18 @@ public class Player_Control : NetworkBehaviour
     {
         float dis = Vector3.Magnitude(bullet_pos - player_pos);
 
-        return (int)(damage * Math.Round((float)((100 - dis) / 100), 2)); //ÀÓÀÇÀÇ °è»ê Á¦´ë·Î ¸öÀÇ Áß½ÉÀ¸·ÎºÎÅÍ °Å¸®¿¡ µû¸¥ ´ë¹ÌÁö °æ°¨ÀÌ µé¾î°¥Áö ¹ÌÁö¼ö
+        return (int)(damage * Math.Round((float)((100 - dis) / 100), 2)); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½ ï¿½Å¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½æ°¨ï¿½ï¿½ ï¿½ï¿½î°¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     }
 
     [Server]
-    private void Time_spent()   //½Ã°£ Èå¸£´Â °Í °ü·Ã
+    private void Time_spent()   //ï¿½Ã°ï¿½ ï¿½å¸£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     {
         float[] t_res = gm.Time_go();
         Time_Update(t_res[0], t_res[1]);
     }
 
     [ClientRpc]
-    public void Time_Update(float m, float s)   //½Ã°£ UI Update
+    public void Time_Update(float m, float s)   //ï¿½Ã°ï¿½ UI Update
     {
         string sec = s < 10 ? "0" + s.ToString() : s.ToString();
         string min = m.ToString() + ":";

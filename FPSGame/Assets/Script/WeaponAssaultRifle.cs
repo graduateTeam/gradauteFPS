@@ -21,9 +21,9 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     [Header("Audio Clips")]
     [SerializeField]
-    private AudioClip audioClipTakeOutWeapon;   // ¹«±â ÀåÂø »ç¿îµå
+    private AudioClip audioClipTakeOutWeapon;   // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-    private AudioSource audioSource;            // »ç¿îµå Àç»ý ÄÄÆ÷³ÍÆ®
+    private AudioSource audioSource;            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 
     public int CurrentAmmo => weaponInfo.currentAmmo;
     public int MaxAmmo => weaponInfo.maxAmmo;
@@ -35,7 +35,7 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void Awake()
     {
-        //Ã³À½ Åº¾à ¼ö´Â ÃÖ´ë·Î ¼³Á¤
+        //Ã³ï¿½ï¿½ Åºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         weaponInfo.currentAmmo = weaponInfo.maxAmmo;
 
         GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
@@ -49,7 +49,7 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     public float[] giveToPC()
     {
-        float[] temp = {weaponInfo.recoilAmount, weaponInfo.recoilRecoverySpeed};
+        float[] temp = { weaponInfo.recoilAmount, weaponInfo.recoilRecoverySpeed };
         return temp;
     }
 
@@ -66,10 +66,10 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void Update()
     {
-        //¹«±â ¾×¼Ç µµÁß¿¡ 'R'Å°¸¦ ´­·¯ ÀçÀåÀüÀ» ½ÃµµÇÏ¸é ¹«±â ¾×¼Ç Á¾·á ÈÄ ÀçÀåÀü ReloadÀÎ½ÄÀ» ¸øÇÔ
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½×¼ï¿½ ï¿½ï¿½ï¿½ß¿ï¿½ 'R'Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ãµï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Reloadï¿½Î½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (Input.GetKeyDown(KeyCode.R))
         {
-            //ÇöÀç ÀçÀåÀü ÁßÀÌ°Å³ª Åº¾à ¼ö°¡ 0ÀÌ¸é ÀçÀåÀü ºÒ°¡
+            //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°Å³ï¿½ Åºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 0ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½
             if (isReload || wholeAmmo <= 0) return;
 
             Debug.Log("GetKeyDown Reload!");
@@ -79,13 +79,13 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void OnEnable()
     {
-        //¹«±â ÀåÂø »ç¿îµå Àç»ý
+        //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         PlaySound(audioClipTakeOutWeapon);
 
-        //¹«±â°¡ È°¼ºÈ­µÉ ¶§ ÇØ´ç ¹«±âÀÇ Åº¾à ¼ö Á¤º¸¸¦ °»½ÅÇÑ´Ù.
+        //ï¿½ï¿½ï¿½â°¡ È°ï¿½ï¿½È­ï¿½ï¿½ ï¿½ï¿½ ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Åºï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
-        if(this != null)
+        if (this != null)
         {
             onAmmoEvent.AddListener(OnAmmoCharged);
         }
@@ -93,16 +93,16 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void PlaySound(AudioClip clip)
     {
-        audioSource.Stop();             // ±âÁ¸¿¡ Àç»ýÁßÀÎ »ç¿îµå¸¦ Á¤ÁöÇÏ°í,
-        audioSource.clip = clip;        // »õ·Î¿î »ç¿îµå clipÀ¸·Î ±³Ã¼ ÈÄ
-        audioSource.Play();             // »ç¿îµå Àç»ý
+        audioSource.Stop();             // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½,
+        audioSource.clip = clip;        // ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ clipï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½ï¿½
+        audioSource.Play();             // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
     }
 
     private void OnDisable()
     {
         if (this != null)
         {
-            Debug.Log("ÀÌº¥Æ® ÇØÁ¦");
+            Debug.Log("ï¿½Ìºï¿½Æ® ï¿½ï¿½ï¿½ï¿½");
             onAmmoEvent.RemoveListener(OnAmmoCharged);
         }
     }
@@ -111,13 +111,13 @@ public class WeaponAssaultRifle : MonoBehaviour
     {
         if (currentAmmo <= 0)
         {
-            Debug.Log("Åº¾àÀÌ ¾ø½À´Ï´Ù.");
+            Debug.Log("Åºï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
             StartCoroutine("OnReload");
         }
     }
     public void UseAmmo()
     {
-        if(CurrentAmmo > 0 && canShoot)
+        if (CurrentAmmo > 0 && canShoot)
         {
             weaponInfo.currentAmmo--;
             onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
@@ -130,23 +130,23 @@ public class WeaponAssaultRifle : MonoBehaviour
         }
     }
 
-    
+
 
     private IEnumerator OnReload()
     {
         isReload = true;
         canShoot = false;
 
-        Debug.Log("ÀçÀåÀü Áß!");
+        Debug.Log("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½!");
 
-        yield return new WaitForSeconds(2f); // 2ÃÊ µ¿¾È ´ë±â
+        yield return new WaitForSeconds(2f); // 2ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
-        //ÀçÀåÀü ¾Ö´Ï¸ÞÀÌ¼Ç, »ç¿îµå Àç»ý
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
         isReload = false;
         canShoot = true;
 
-        //ÇöÀç Åº¾à ¼ö¸¦ ÃÖ´ë·Î ¼³Á¤ÇÏ°í, ¹Ù²ï Åº¾à ¼ö Á¤º¸¸¦ Text UI¿¡ ¾÷µ¥ÀÌÆ®
+        //ï¿½ï¿½ï¿½ï¿½ Åºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½, ï¿½Ù²ï¿½ Åºï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Text UIï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
         int addAmmo = (weaponInfo.maxAmmo - weaponInfo.currentAmmo);
 
         if (addAmmo > weaponInfo.wholeAmmo)
@@ -165,8 +165,8 @@ public class WeaponAssaultRifle : MonoBehaviour
 
         /*while (true)
         {
-            //Á¶°Ç¹®¿¡ »ç¿îµå°¡ Àç»ýÁßÀÌ ¾Æ´Ï°í, ÇöÀç ¾Ö´Ï¸ÞÀÌ¼ÇÀÌ MovementÀÌ¸é
-            //ÀçÀåÀü ¾Ö´Ï¸ÞÀÌ¼Ç(, »ç¿îµå) Àç»ýÀÌ Á¾·áµÇ¾ú´Ù´Â ÀÇ¹Ì
+            //ï¿½ï¿½ï¿½Ç¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½å°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Ï°ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ Movementï¿½Ì¸ï¿½
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½(, ï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½Ù´ï¿½ ï¿½Ç¹ï¿½
             if(true)
             {
                 

@@ -7,7 +7,7 @@ public class Bullet_Control : NetworkBehaviour
 {
     public Bullet_Pool bp;
 
-    public static Bullet_Control bc_instance;   //½Ì±ÛÅæ ¹æ½ÄÀ¸·Î ¿ÀºêÁ§Æ® °øÀ¯
+    public static Bullet_Control bc_instance;   //ï¿½Ì±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
     public static GameManager gm_instance;
 
     public Vector3 gunEndPos;
@@ -61,7 +61,7 @@ public class Bullet_Control : NetworkBehaviour
 
         this.gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
 
-        Debug.Log("ÃÑ¾Ë À§Ä¡: " + this.gunEndPos);
+        Debug.Log("ï¿½Ñ¾ï¿½ ï¿½ï¿½Ä¡: " + this.gunEndPos);
     }
 
 
@@ -70,7 +70,7 @@ public class Bullet_Control : NetworkBehaviour
         bp = Bullet_Pool.bp_instance;
         gm_instance = GameManager.gm_instance;
 
-        if (bc_instance == null )
+        if (bc_instance == null)
         {
             bc_instance = this;
         }
@@ -88,15 +88,15 @@ public class Bullet_Control : NetworkBehaviour
     }
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.tag != "bullet" && collision.gameObject.name != "Weapon")    //ÃÑ¾Ë³¢¸® ºÎµúÇô¼­ »ç¶óÁö´Â °æ¿ì¸¦ ¹èÁ¦
+        if (collision.gameObject.tag != "bullet" && collision.gameObject.name != "Weapon")    //ï¿½Ñ¾Ë³ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ì¸¦ ï¿½ï¿½ï¿½ï¿½
         {
-            Debug.Log("ÃÑ¾ËÀÇ ÂøÅº: " + this.transform.position + " // " + collision.gameObject.name);
+            Debug.Log("ï¿½Ñ¾ï¿½ï¿½ï¿½ ï¿½ï¿½Åº: " + this.transform.position + " // " + collision.gameObject.name);
 
             bp.ReturnBullet(this.gameObject);
         }
-            
+
     }
-    public void Bullet_Shoot()   //±×³É ÃÑÀÇ rigidBody´Â ¹Þ¾Æ¶ó ±×³É;;
+    public void Bullet_Shoot()   //ï¿½×³ï¿½ ï¿½ï¿½ï¿½ï¿½ rigidBodyï¿½ï¿½ ï¿½Þ¾Æ¶ï¿½ ï¿½×³ï¿½;;
     {
         if (weapon == null)
         {
@@ -110,39 +110,39 @@ public class Bullet_Control : NetworkBehaviour
 
         GameObject bullet = bp.GetBullet();
 
-        bullet.gameObject.name = "kjih's bullet";   //³¯¶ó°¡´Â ¼ø°£ ÀÌ¸§ º¯°æ(ÇÃ·¹ÀÌ¾î + bullet) ´©±º°¡ÀÇ ÃÑ¾ËÀÎÁö ÆÄ¾Ç
+        bullet.gameObject.name = "kjih's bullet";   //ï¿½ï¿½ï¿½ó°¡´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ + bullet) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ä¾ï¿½
         Debug.Log("Bullet name change: " + bullet.gameObject.name);
 
         RaycastHit hit;
         Vector3 targetPoint = Vector3.zero;
 
-        //È­¸é Á¤Áß¾Ó ÁÂÇ¥
+        //È­ï¿½ï¿½ ï¿½ï¿½ï¿½ß¾ï¿½ ï¿½ï¿½Ç¥
         Ray oldray = Camera.main.ViewportPointToRay(Vector2.one * 0.5f);
         Ray ray = new Ray(rb_weapon.transform.position, Head.transform.rotation * oldray.direction);
 
 
         if (Physics.Raycast(ray, out hit, 1000))
         {
-            //¹°°ÇÀÌ °¨ÁöµÆÀ» °æ¿ì À§Ä¡ ÆÄ¾Ç
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½Ä¾ï¿½
             targetPoint = hit.point;
         }
         else
-        {   //10¿¡ ÃÑÀÇ »ç°Å¸®¸¦ ³ÖÀÚ
+        {   //10ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             targetPoint = ray.origin + ray.direction * attackDis;
         }
 
         Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
 
-        //¹æÇâÀ» ÇÃ·¹ÀÌ¾î°¡ ¹Ù¶óº¸´Â ¹æÇâÀ¸·Î Á¶Á¤
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Ù¶óº¸´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         Vector3 attackDirection = Head.transform.forward;
 
-        // ÃÑ¾ËÀÇ À§Ä¡¸¦ ÃÑÀÇ ³¡À¸·Î ¼³Á¤
+        // ï¿½Ñ¾ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         bullet.transform.position = gunEndPos;
 
-        // ÃÑ¾ËÀÇ ¹æÇâ ¼³Á¤
+        // ï¿½Ñ¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         bullet.transform.rotation = Quaternion.LookRotation(attackDirection);
 
-        // ÃÑ¾Ë¿¡ ÈûÀ» °¡ÇÔ
+        // ï¿½Ñ¾Ë¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         bullet.GetComponent<Rigidbody>().velocity = attackDirection * attackSpd;
 
         if (Physics.Raycast(gunEndPos, attackDirection, out hit, 1000))
