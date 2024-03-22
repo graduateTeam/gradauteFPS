@@ -2,9 +2,6 @@ using System.Collections;
 using UnityEngine;
 using Mirror;
 using System;
-using UnityEditor.U2D.Sprites;
-using Unity.VisualScripting;
-using System.Xml.Linq;
 
 /*
 * ���� GameManabger�� �и� ��ų ������������ ��ġ ��������.
@@ -21,34 +18,34 @@ public class Player_Control : NetworkBehaviour
     public float MouseY;    //���콺�� ���� ���� ������
     private Vector3 jumpDirection;
 
-    [SyncVar]
+    //[SyncVar]
     public bool moving;
 
-    [SyncVar]
+    //[SyncVar]
     public int HP;  //�÷��̾��� ü��
 
-    [SyncVar]
+    //[SyncVar]
     public float lim_Speed; //�ִ� �ӷ�
 
-    [SyncVar]
+    //[SyncVar]
     public float jumpPower; //������
 
-    [SyncVar]
+    //[SyncVar]
     public float speed; //�÷��̾��� �ӵ�
 
-    [SyncVar]
+    //[SyncVar]
     public float MouseSen;
 
-    [SyncVar]
+    //[SyncVar]
     public float Respawn_Time;    //������ �ð�
 
-    [SyncVar]
+    //[SyncVar]
     public float attackRate;    //�� ���� ����
 
-    [SyncVar]
+    //[SyncVar]
     public GameObject Head;
 
-    [SyncVar]
+    //[SyncVar]
     public GameObject Arm;
 
     public WeaponAssaultRifle AssaultRifle;
@@ -72,7 +69,7 @@ public class Player_Control : NetworkBehaviour
     public Bullet_Control bc;
     public GameManager gm;
 
-    [SyncVar]
+    //[SyncVar]
     public bool canFire = true;
 
     // Update is called once per frame
@@ -133,13 +130,13 @@ public class Player_Control : NetworkBehaviour
 
         if (NetworkServer.active && !gm.Time_isMinus())
         {
-            Time_spent();
+            //Time_spent();
         }
 
         bc.getFromPC(Attack_point);
     }
 
-    public void Rebound()
+    public void Rebound()   //�ݵ��Լ�
     {
         // �ݵ��� �ε巴�� �����Ѵ�.
         if (AssaultRifle.canShoot && !canFire)  //�ð��� ������
@@ -165,7 +162,7 @@ public class Player_Control : NetworkBehaviour
         return Mathf.Sqrt(2 * 2 * Physics.gravity.magnitude);
     }
 
-    private void player_movement()
+    private void player_movement()  //�÷��̾� ������ �Լ�
     {
         if (!isLocalPlayer) return;
 
@@ -183,7 +180,6 @@ public class Player_Control : NetworkBehaviour
                    - new Vector3(transform.forward.x, 0, transform.forward.z) * Vertical_move: ���� �Է¿� ���� �̵� ����, y ���� 0���� �����Ͽ� ���������θ� ������
                    - �� �̵� ���� ���� �� .normalized�� ũ�� 1�� ���� -> �밢�� �̵� �� �ӵ� �����ϰ� ���� */
                 Vector3 moveDirection = (transform.right * Horizontal_move + new Vector3(Head.transform.forward.x, 0, Head.transform.forward.z) * Vertical_move).normalized;
-
 
 
 
@@ -257,13 +253,13 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void Hitted_Bullet(int damage)   //CmdReduceHP�� �ܺ������� ���� �Լ�
+    //[Command]
+    public void Hitted_Bullet(int damage)   //CmdReduceHP�� �ܺ������� ���� �Լ� �� ��� �Լ�
     {
         CmdReduceHP(damage);
     }
 
-    [Command]
+    //[Command]
     void CmdReduceHP(int damage)
     {
         if (HP > damage)
@@ -272,7 +268,7 @@ public class Player_Control : NetworkBehaviour
             HP = 0;
     }
 
-    [Command]   //Command�� ������ Ŭ���̾�Ʈ���� ȣ�������� ó���� ����(Mirror)���� ��
+    //[Command]   //Command�� ������ Ŭ���̾�Ʈ���� ȣ�������� ó���� ����(Mirror)���� ��
     void CmdFire()  //�Ѿ� �߻� ���������� ó��
     {
         try
@@ -286,7 +282,7 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
-    [Command]
+    //[Command]
     void CmdplayerDies()
     {
         alive = false;
@@ -295,7 +291,7 @@ public class Player_Control : NetworkBehaviour
         //StartCoroutine("Respawn");
     }
 
-    [ClientRpc]
+    //[ClientRpc]
     void RpcplayerDies()
     {
         //�״� �Ҹ� �� �ִϸ��̼�
@@ -360,13 +356,13 @@ public class Player_Control : NetworkBehaviour
         Body_Rotate(quat, Head);
         Body_Rotate(quat, Arm);
     }
-    private void Body_Rotate(Quaternion quat , GameObject g_object)
+    private void Body_Rotate(Quaternion quat, GameObject g_object)
     {
         g_object.transform.rotation
             = Quaternion.Slerp(transform.rotation, quat, Time.fixedDeltaTime * MouseSen);
     }
 
-    [Server]
+    //[Server]
     private void SpawnPlayer()  //���������� ���� �÷��̾� ��ġ���� �Ҵ�Ǿ�� �Ѵ�.
     {
         Vector3 Spawn_Point = new Vector3(0, 20, 0);
@@ -403,17 +399,6 @@ public class Player_Control : NetworkBehaviour
         gm.UI_Init();   //UI �ʱ�ȭ
 
         moving = false;
-
-        foreach (Transform child in Attack_point.transform)
-        {
-            if (child.tag == "MainCamera")
-            {
-                Cam = child.GetComponent<Camera>();
-
-                Debug.Log("Camera Found! : " + Cam);
-                break;
-            }
-        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -446,15 +431,15 @@ public class Player_Control : NetworkBehaviour
 
         return (int)(damage * Math.Round((float)((100 - dis) / 100), 2)); //������ ��� ����� ���� �߽����κ��� �Ÿ��� ���� ����� �氨�� ���� ������
     }
-
-    [Server]
+    /*
+    //[Server]
     private void Time_spent()   //�ð� �帣�� �� ����
     {
         float[] t_res = gm.Time_go();
         Time_Update(t_res[0], t_res[1]);
     }
 
-    [ClientRpc]
+    //[ClientRpc]
     public void Time_Update(float m, float s)   //�ð� UI Update
     {
         string sec = s < 10 ? "0" + s.ToString() : s.ToString();
@@ -462,5 +447,5 @@ public class Player_Control : NetworkBehaviour
 
         gm.game_Time_UI.text = string.Format(min + sec);
     }
-
+    */
 }

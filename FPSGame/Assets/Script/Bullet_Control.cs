@@ -70,7 +70,7 @@ public class Bullet_Control : NetworkBehaviour
         bp = Bullet_Pool.bp_instance;
         gm_instance = GameManager.gm_instance;
 
-        if (bc_instance == null)
+        if (bc_instance == null )
         {
             bc_instance = this;
         }
@@ -94,7 +94,7 @@ public class Bullet_Control : NetworkBehaviour
 
             bp.ReturnBullet(this.gameObject);
         }
-
+            
     }
     public void Bullet_Shoot()   //�׳� ���� rigidBody�� �޾ƶ� �׳�;;
     {

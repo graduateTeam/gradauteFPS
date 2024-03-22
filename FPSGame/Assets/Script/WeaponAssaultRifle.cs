@@ -49,7 +49,7 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     public float[] giveToPC()
     {
-        float[] temp = { weaponInfo.recoilAmount, weaponInfo.recoilRecoverySpeed };
+        float[] temp = {weaponInfo.recoilAmount, weaponInfo.recoilRecoverySpeed};
         return temp;
     }
 
@@ -85,7 +85,7 @@ public class WeaponAssaultRifle : MonoBehaviour
         //���Ⱑ Ȱ��ȭ�� �� �ش� ������ ź�� �� ������ �����Ѵ�.
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
-        if (this != null)
+        if(this != null)
         {
             onAmmoEvent.AddListener(OnAmmoCharged);
         }
@@ -117,7 +117,7 @@ public class WeaponAssaultRifle : MonoBehaviour
     }
     public void UseAmmo()
     {
-        if (CurrentAmmo > 0 && canShoot)
+        if(CurrentAmmo > 0 && canShoot)
         {
             weaponInfo.currentAmmo--;
             onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
@@ -130,7 +130,7 @@ public class WeaponAssaultRifle : MonoBehaviour
         }
     }
 
-
+    
 
     private IEnumerator OnReload()
     {
