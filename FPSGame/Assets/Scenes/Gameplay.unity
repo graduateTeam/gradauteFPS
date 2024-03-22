@@ -1572,7 +1572,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &271317747
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4045,7 +4045,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   HP_bar: {fileID: 1785138620}
   HP_text: {fileID: 1663437904}
-  Respawn_bar: {fileID: 2053800350}
   ImageAim: {fileID: 1625523108}
   game_Time_UI: {fileID: 1161406072}
   weapon: {fileID: 0}
