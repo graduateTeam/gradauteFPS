@@ -7,7 +7,7 @@ public class Bullet_Control : NetworkBehaviour
 {
     public Bullet_Pool bp;
 
-    public static Bullet_Control bc_instance;   //�̱��� �������?������Ʈ ����
+    public static Bullet_Control bc_instance;
     public static GameManager gm_instance;
 
     public Vector3 gunEndPos;
@@ -61,7 +61,7 @@ public class Bullet_Control : NetworkBehaviour
 
         this.gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
 
-        Debug.Log("�Ѿ� ��ġ: " + this.gunEndPos);
+        Debug.Log("�Ѿ� �߻� ��ġ: " + this.gunEndPos);
     }
 
 
@@ -88,10 +88,8 @@ public class Bullet_Control : NetworkBehaviour
     }
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.tag != "bullet" && collision.gameObject.name != "Weapon")    //�Ѿ˳��� �ε����� �������?���?����
+        if (collision.gameObject.tag != "bullet" && collision.gameObject.name != "Weapon")
         {
-            Debug.Log("�Ѿ��� ��ź: " + this.transform.position + " // " + collision.gameObject.name);
-
             bp.ReturnBullet(this.gameObject);
         }
             
@@ -111,39 +109,33 @@ public class Bullet_Control : NetworkBehaviour
 
         GameObject bullet = bp.GetBullet();
 
-        bullet.gameObject.name = "kjih's bullet";   //���󰡴� ���� �̸� ����(�÷��̾� + bullet) �������� �Ѿ����� �ľ�
+        bullet.gameObject.name = "kjih's bullet";
         Debug.Log("Bullet name change: " + bullet.gameObject.name);
 
         RaycastHit hit;
         Vector3 targetPoint = Vector3.zero;
 
-        //ȭ�� ���߾� ��ǥ
         Ray oldray = Camera.main.ViewportPointToRay(Vector2.one * 0.5f);
         Ray ray = new Ray(rb_weapon.transform.position, Head.transform.rotation * oldray.direction);
 
 
         if (Physics.Raycast(ray, out hit, 1000))
         {
-            //������ �������� ���?��ġ �ľ�
             targetPoint = hit.point;
         }
         else
-        {   //10�� ���� ��Ÿ���?����
+        {
             targetPoint = ray.origin + ray.direction * attackDis;
         }
 
         Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
 
-        //������ �÷��̾ �ٶ󺸴� �������� ����
         Vector3 attackDirection = Head.transform.forward;
 
-        // �Ѿ��� ��ġ�� ���� ������ ����
         bullet.transform.position = gunEndPos;
 
-        // �Ѿ��� ���� ����
         bullet.transform.rotation = Quaternion.LookRotation(attackDirection);
 
-        // �Ѿ˿� ���� ����
         bullet.GetComponent<Rigidbody>().velocity = attackDirection * attackSpd;
 
         if (Physics.Raycast(gunEndPos, attackDirection, out hit, 1000))

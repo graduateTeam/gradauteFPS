@@ -38,7 +38,7 @@ public class OnlineUI : MonoBehaviour
                 manager.StartClient();
             }catch(Exception e)
             {
-                Debug.Log("����: " + e);
+                Debug.Log("입장: " + e);
             }
         }
         else
