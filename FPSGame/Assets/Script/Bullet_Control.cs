@@ -1,7 +1,5 @@
 ﻿using Mirror;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Bullet_Control : NetworkBehaviour
 {
@@ -22,9 +20,7 @@ public class Bullet_Control : NetworkBehaviour
 
     public GameObject player;
     public GameObject Head;
-    public Rigidbody rb_player;
     public Rigidbody rb_weapon;
-    public Collider gunCollider;
 
     public override void OnStartServer()
     {
@@ -54,9 +50,7 @@ public class Bullet_Control : NetworkBehaviour
 
     public void getFromPC(GameObject player)
     {
-        this.player = player;
-
-        foreach (Transform child in this.player.transform)
+        foreach (Transform child in player.transform)
         {
             if (child.gameObject.name == "Head")
             {
@@ -64,8 +58,8 @@ public class Bullet_Control : NetworkBehaviour
             }
         }
 
-        this.rb_player = player.GetComponent<Rigidbody>();
-        this.gunCollider = rb_player.GetComponent<Collider>();
+        Rigidbody rb_player = player.GetComponent<Rigidbody>();
+        Collider gunCollider = rb_player.GetComponent<Collider>();
 
         foreach (Transform child in player.transform)
         {
@@ -75,8 +69,8 @@ public class Bullet_Control : NetworkBehaviour
 
                 float[] receive = weapon.Gun_Info();
 
-                this.attackDis = receive[0];
-                this.attackSpd = receive[1];
+                attackDis = receive[0];
+                attackSpd = receive[1];
 
                 break;
             }
@@ -85,7 +79,7 @@ public class Bullet_Control : NetworkBehaviour
         Renderer renderer = rb_weapon.GetComponent<Renderer>();
         float localZOffset = rb_weapon.transform.InverseTransformPoint(renderer.bounds.center).z;
 
-        this.gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
+        gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
     }
 
 
@@ -109,6 +103,7 @@ public class Bullet_Control : NetworkBehaviour
         }
 
     }
+
     public void Bullet_Shoot()
     {
         if (weapon == null)

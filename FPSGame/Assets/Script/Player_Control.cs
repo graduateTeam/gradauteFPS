@@ -60,8 +60,6 @@ public class Player_Control : NetworkBehaviour
     {
         AssaultRifle = GetComponentInChildren<WeaponAssaultRifle>();
         attackRate = AssaultRifle.weapon_attackRate();
-        bc = GetComponent<Bullet_Control>();
-        gm = GetComponent<GameManager>();
 
         getInstance();
     }
@@ -107,10 +105,6 @@ public class Player_Control : NetworkBehaviour
 
         if (gm != null)
             gm.HP_UI_Update(HP);
-        /*if (NetworkServer.active && !gm.Time_isMinus())
-        {
-            //Time_spent();            
-        }*/
 
         if (bc != null)
             bc.getFromPC(Attack_point);
@@ -220,7 +214,7 @@ public class Player_Control : NetworkBehaviour
         if(isLocalPlayer)
         {
             Debug.Log("I'm Client!");
-            SpawnPlayer();
+            //SpawnPlayer();
         }
 
         /*if (isLocalPlayer && NetworkClient.ready)
@@ -250,7 +244,6 @@ public class Player_Control : NetworkBehaviour
             HP = 0;
     }
 
-    [Command]
     void CmdFire()
     {
         try
@@ -263,7 +256,7 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
-    [Command]
+    //[ClientRpc]
     void CmdplayerDies()
     {
         alive = false;
@@ -272,7 +265,7 @@ public class Player_Control : NetworkBehaviour
         //StartCoroutine("Respawn");
     }
 
-    [ClientRpc]
+    //[ClientRpc]
     void RpcplayerDies()
     {
 
