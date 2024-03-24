@@ -252,8 +252,8 @@ MonoBehaviour:
   MouseSen: 500
   Respawn_Time: 5
   attackRate: 0
-  Head: {fileID: 5251791120114805124}
-  Arm: {fileID: 7584032128347026474}
+  Head: {fileID: 7584032128347026474}
+  Arm: {fileID: 5251791120114805124}
   AssaultRifle: {fileID: 0}
   currentRecoil: 0
   recoilAmount: 0

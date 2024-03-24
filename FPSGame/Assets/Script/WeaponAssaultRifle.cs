@@ -38,11 +38,11 @@ public class WeaponAssaultRifle : MonoBehaviour
         //ó�� ź�� ���� �ִ�� ����
         weaponInfo.currentAmmo = weaponInfo.maxAmmo;
 
-        GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
-        GameManager.gm_instance.getGunLabel(WeaponInfo.weaponName);
+        GameManager.instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
+        GameManager.instance.getGunLabel(WeaponInfo.weaponName);
 
         canShoot = true;
-        bc = Bullet_Control.bc_instance;
+        bc = Bullet_Control.instance;
 
         audioSource = GetComponent<AudioSource>();
     }
@@ -122,7 +122,7 @@ public class WeaponAssaultRifle : MonoBehaviour
             weaponInfo.currentAmmo--;
             onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
-            GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
+            GameManager.instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
         }
         else
         {
@@ -161,7 +161,7 @@ public class WeaponAssaultRifle : MonoBehaviour
         }
 
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
-        GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
+        GameManager.instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
         /*while (true)
         {

@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     //public Image Respawn_bar;
     public Image ImageAim;
 
-    public static GameManager gm_instance;
+    public static GameManager instance;
 
     public TextMeshProUGUI game_Time_UI;
 
@@ -36,9 +36,9 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        if(gm_instance == null)
+        if(instance == null)
         {
-            gm_instance = this;
+            instance = this;
         }
         else
         {

@@ -7,7 +7,7 @@ public class Bullet_Control : NetworkBehaviour
 {
     public Bullet_Pool bp;
 
-    public static Bullet_Control bc_instance;   //�̱��� ������� ������Ʈ ����
+    public static Bullet_Control instance;   //�̱��� ������� ������Ʈ ����
     public static GameManager gm_instance;
 
     public Vector3 gunEndPos;
@@ -68,11 +68,11 @@ public class Bullet_Control : NetworkBehaviour
     void Awake()
     {
         bp = Bullet_Pool.bp_instance;
-        gm_instance = GameManager.gm_instance;
+        gm_instance = GameManager.instance;
 
-        if (bc_instance == null )
+        if (instance == null )
         {
-            bc_instance = this;
+            instance = this;
         }
         else
         {
