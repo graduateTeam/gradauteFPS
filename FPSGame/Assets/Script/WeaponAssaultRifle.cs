@@ -21,9 +21,9 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     [Header("Audio Clips")]
     [SerializeField]
-    private AudioClip audioClipTakeOutWeapon;
+    private AudioClip audioClipTakeOutWeapon;   // ���� ���� ����
 
-    private AudioSource audioSource;
+    private AudioSource audioSource;            // ���� ��� ������Ʈ
 
     public int CurrentAmmo => weaponInfo.currentAmmo;
     public int MaxAmmo => weaponInfo.maxAmmo;
@@ -35,20 +35,21 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void Awake()
     {
+        //ó�� ź�� ���� �ִ�� ����
         weaponInfo.currentAmmo = weaponInfo.maxAmmo;
 
-        GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
-        GameManager.gm_instance.getGunLabel(WeaponInfo.weaponName);
+        GameManager.instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
+        GameManager.instance.getGunLabel(WeaponInfo.weaponName);
 
         canShoot = true;
-        bc = Bullet_Control.bc_instance;
+        bc = Bullet_Control.instance;
 
         audioSource = GetComponent<AudioSource>();
     }
 
     public float[] giveToPC()
     {
-        float[] temp = {weaponInfo.recoilAmount, weaponInfo.recoilRecoverySpeed};
+        float[] temp = { weaponInfo.recoilAmount, weaponInfo.recoilRecoverySpeed };
         return temp;
     }
 
@@ -59,14 +60,16 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     public float[] Gun_Info()
     {
-        float[] temp = {weaponInfo.attackDistance, weaponInfo.bulletSpeed};
+        float[] temp = { weaponInfo.attackDistance, weaponInfo.bulletSpeed };
         return temp;
     }
 
     private void Update()
     {
+        //���� �׼� ���߿� 'R'Ű�� ���� �������� �õ��ϸ� ���� �׼� ���� �� ������ Reload�ν��� ����
         if (Input.GetKeyDown(KeyCode.R))
         {
+            //���� ������ ���̰ų� ź�� ���� 0�̸� ������ �Ұ�
             if (isReload || wholeAmmo <= 0) return;
 
             Debug.Log("GetKeyDown Reload!");
@@ -76,11 +79,13 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void OnEnable()
     {
+        //���� ���� ���� ���
         PlaySound(audioClipTakeOutWeapon);
 
+        //���Ⱑ Ȱ��ȭ�� �� �ش� ������ ź�� �� ������ �����Ѵ�.
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
-        if(this != null)
+        if (this != null)
         {
             onAmmoEvent.AddListener(OnAmmoCharged);
         }
@@ -88,16 +93,16 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void PlaySound(AudioClip clip)
     {
-        audioSource.Stop();
-        audioSource.clip = clip;
-        audioSource.Play();
+        audioSource.Stop();             // ������ ������� ���带 �����ϰ�,
+        audioSource.clip = clip;        // ���ο� ���� clip���� ��ü ��
+        audioSource.Play();             // ���� ���
     }
 
     private void OnDisable()
     {
         if (this != null)
         {
-            Debug.Log("총알 발사 불가");
+            Debug.Log("�̺�Ʈ ����");
             onAmmoEvent.RemoveListener(OnAmmoCharged);
         }
     }
@@ -106,18 +111,18 @@ public class WeaponAssaultRifle : MonoBehaviour
     {
         if (currentAmmo <= 0)
         {
-            Debug.Log("재장전!");
+            Debug.Log("ź���� �����ϴ�.");
             StartCoroutine("OnReload");
         }
     }
     public void UseAmmo()
     {
-        if(CurrentAmmo > 0 && canShoot)
+        if (CurrentAmmo > 0 && canShoot)
         {
             weaponInfo.currentAmmo--;
             onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
-            GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
+            GameManager.instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
         }
         else
         {
@@ -125,7 +130,7 @@ public class WeaponAssaultRifle : MonoBehaviour
         }
     }
 
-    
+
 
     private IEnumerator OnReload()
     {
@@ -134,11 +139,14 @@ public class WeaponAssaultRifle : MonoBehaviour
 
         Debug.Log("������ ��!");
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(2f); // 2�� ���� ���
+
+        //������ �ִϸ��̼�, ���� ���
 
         isReload = false;
         canShoot = true;
 
+        //���� ź�� ���� �ִ�� �����ϰ�, �ٲ� ź�� �� ������ Text UI�� ������Ʈ
         int addAmmo = (weaponInfo.maxAmmo - weaponInfo.currentAmmo);
 
         if (addAmmo > weaponInfo.wholeAmmo)
@@ -153,10 +161,12 @@ public class WeaponAssaultRifle : MonoBehaviour
         }
 
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
-        GameManager.gm_instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
+        GameManager.instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
         /*while (true)
         {
+            //���ǹ��� ���尡 ������� �ƴϰ�, ���� �ִϸ��̼��� Movement�̸�
+            //������ �ִϸ��̼�(, ����) ����� ����Ǿ��ٴ� �ǹ�
             if(true)
             {
                 

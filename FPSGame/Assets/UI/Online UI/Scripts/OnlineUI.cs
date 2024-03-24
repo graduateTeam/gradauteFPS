@@ -34,8 +34,11 @@ public class OnlineUI : MonoBehaviour
         {
             try
             {
+                //NetManager.OnServerConnect(NetworkConnectionToClient);
+
                 var manager = OSOPRoomManager.singleton;
                 manager.StartClient();
+
             }catch(Exception e)
             {
                 Debug.Log("입장: " + e);

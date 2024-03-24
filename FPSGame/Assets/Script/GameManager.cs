@@ -2,17 +2,18 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Mirror;
 /*
 * UI관련 및 Map 좌표 정리 등등...
 */
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
     public Image HP_bar;
     public TextMeshProUGUI HP_text;
     //public Image Respawn_bar;
     public Image ImageAim;
 
-    public static GameManager gm_instance;
+    public static GameManager instance;
 
     public TextMeshProUGUI game_Time_UI;
 
@@ -34,15 +35,42 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI gunLabel;
 
-    private void Awake()
+    public override void OnStartServer()
     {
-        if(gm_instance == null)
+        if (instance == null)
         {
-            gm_instance = this;
+            instance = this;
+            Debug.Log("GameManager instance activate Server!");
         }
         else
         {
-            Debug.LogWarning("gm_instance already exists, destroying object!");
+            Debug.Log("GameManager instance Already exist Server!");
+        }
+    }
+
+    public override void OnStartClient()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            Debug.Log("GameManager instance activate Client!");
+        }
+        else
+        {
+            Debug.Log("GameManager instance Already exist Client!");
+        }
+    }
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Debug.LogError("Multiple instances of GameManager detected.");
+        }
+        else
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
         }
 
         Cursor.lockState = CursorLockMode.Locked;
@@ -75,8 +103,11 @@ public class GameManager : MonoBehaviour
 
     public void HP_UI_Update(int hp)
     {
-        HP_bar.fillAmount = hp / 100f;
-        HP_text.text = string.Format("{0} / 100", hp);
+        if(HP_bar.gameObject.activeSelf)
+        {
+            HP_bar.fillAmount = hp / 100f;
+            HP_text.text = string.Format("{0} / 100", hp);
+        }
 
         /*if(hp <= 0)
             Respawn_bar.gameObject.SetActive(true);

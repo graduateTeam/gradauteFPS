@@ -1,4 +1,4 @@
-using Mirror;
+癤퓎sing Mirror;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +7,7 @@ public class Bullet_Control : NetworkBehaviour
 {
     public Bullet_Pool bp;
 
-    public static Bullet_Control bc_instance;
+    public static Bullet_Control instance;
     public static GameManager gm_instance;
 
     public Vector3 gunEndPos;
@@ -26,13 +26,39 @@ public class Bullet_Control : NetworkBehaviour
     public Rigidbody rb_weapon;
     public Collider gunCollider;
 
-    public void getFromPC(GameObject player)    //값을 받아와 적절한 위치 선정까지
+    public override void OnStartServer()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            Debug.Log("Bullet_Control instance activate Server!");
+        }
+        else
+        {
+            Debug.Log("Bullet_Control instance Already exist Server!");
+        }
+    }
+
+    public override void OnStartClient()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            Debug.Log("Bullet_Control instance activate Client!");
+        }
+        else
+        {
+            Debug.Log("Bullet_Control instance Already exist Client!");
+        }
+    }
+
+    public void getFromPC(GameObject player)
     {
         this.player = player;
-        
-        foreach(Transform child in this.player.transform)
+
+        foreach (Transform child in this.player.transform)
         {
-            if(child.gameObject.name == "Head")
+            if (child.gameObject.name == "Head")
             {
                 Head = child.gameObject;
             }
@@ -41,9 +67,9 @@ public class Bullet_Control : NetworkBehaviour
         this.rb_player = player.GetComponent<Rigidbody>();
         this.gunCollider = rb_player.GetComponent<Collider>();
 
-        foreach(Transform child in player.transform)
+        foreach (Transform child in player.transform)
         {
-            if(child.tag == "Weapon")
+            if (child.tag == "Weapon")
             {
                 rb_weapon = child.GetComponentInChildren<Rigidbody>();
 
@@ -51,7 +77,7 @@ public class Bullet_Control : NetworkBehaviour
 
                 this.attackDis = receive[0];
                 this.attackSpd = receive[1];
-                
+
                 break;
             }
         }
@@ -60,24 +86,13 @@ public class Bullet_Control : NetworkBehaviour
         float localZOffset = rb_weapon.transform.InverseTransformPoint(renderer.bounds.center).z;
 
         this.gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
-
-        Debug.Log("총알 발사 위치: " + this.gunEndPos);
     }
 
 
     void Awake()
     {
-        bp = Bullet_Pool.bp_instance;
-        gm_instance = GameManager.gm_instance;
-
-        if (bc_instance == null )
-        {
-            bc_instance = this;
-        }
-        else
-        {
-            Debug.LogWarning("bc_Instance already exists, destroying object!");
-        }
+        bp = Bullet_Pool.instance;
+        gm_instance = GameManager.instance;
 
         gm_instance.AimPos(gunEndPos);
     }
@@ -92,10 +107,9 @@ public class Bullet_Control : NetworkBehaviour
         {
             bp.ReturnBullet(this.gameObject);
         }
-            
-    }
 
-    public void Bullet_Shoot()   //총알 발사로직
+    }
+    public void Bullet_Shoot()
     {
         if (weapon == null)
         {
@@ -130,12 +144,16 @@ public class Bullet_Control : NetworkBehaviour
 
         Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
 
+        
         Vector3 attackDirection = Head.transform.forward;
 
+        
         bullet.transform.position = gunEndPos;
 
+        
         bullet.transform.rotation = Quaternion.LookRotation(attackDirection);
 
+        
         bullet.GetComponent<Rigidbody>().velocity = attackDirection * attackSpd;
 
         if (Physics.Raycast(gunEndPos, attackDirection, out hit, 1000))
