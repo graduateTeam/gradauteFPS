@@ -85,6 +85,11 @@ public class Bullet_Control : NetworkBehaviour
 
     void Awake()
     {
+        if (isServer)
+            OnStartServer();
+        else
+            OnStartClient();
+
         bp = Bullet_Pool.instance;
         gm_instance = GameManager.instance;
 

@@ -35,31 +35,6 @@ public class GameManager : NetworkBehaviour
     [SerializeField]
     private TextMeshProUGUI gunLabel;
 
-    public override void OnStartServer()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            Debug.Log("GameManager instance activate Server!");
-        }
-        else
-        {
-            Debug.Log("GameManager instance Already exist Server!");
-        }
-    }
-
-    public override void OnStartClient()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            Debug.Log("GameManager instance activate Client!");
-        }
-        else
-        {
-            Debug.Log("GameManager instance Already exist Client!");
-        }
-    }
 
     private void Awake()
     {
