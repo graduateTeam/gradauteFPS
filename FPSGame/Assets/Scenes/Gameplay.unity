@@ -5683,7 +5683,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  bulletPrefab: {fileID: 7362762234294061442, guid: e7bb071102ef2424fabf52071da11e1f, type: 3}
+  bulletPrefab: {fileID: 790916204578897456, guid: e7bb071102ef2424fabf52071da11e1f, type: 3}
   poolSize: 100
 --- !u!4 &1365744015
 Transform:
