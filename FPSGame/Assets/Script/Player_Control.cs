@@ -129,6 +129,8 @@ public class Player_Control : NetworkBehaviour
 
     public void Rebound()   //반동함수
     {
+        if(!isLocalPlayer) return;
+
         if (AssaultRifle.canShoot && !canFire)
         {
             MouseY += currentRecoil * Time.deltaTime;
@@ -228,13 +230,11 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
-    [Command]
     public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수 피 깎는 함수
     {
         CmdReduceHP(damage);
     }
 
-    [Command]
     void CmdReduceHP(int damage)
     {
         if (HP > damage)
@@ -309,6 +309,8 @@ public class Player_Control : NetworkBehaviour
 
     private void Rotate()
     {
+        if (!isLocalPlayer) return;
+
         if (alive)
         {
             MouseX += Input.GetAxisRaw("Mouse X") * MouseSen * Time.deltaTime;
