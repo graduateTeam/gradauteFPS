@@ -115,15 +115,11 @@ public class Bullet_Control : NetworkBehaviour
             Debug.LogError("Weapon is null!");
             return;
         }
-
         weapon.UseAmmo();
 
         if (!weapon.canShoot) return;
 
         GameObject bullet = bp.GetBullet();
-
-        bullet.gameObject.name = "kjih's bullet";
-        Debug.Log("Bullet name change: " + bullet.gameObject.name);
 
         RaycastHit hit;
         Vector3 targetPoint = Vector3.zero;

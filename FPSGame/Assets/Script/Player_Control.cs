@@ -230,19 +230,6 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
-    public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수 피 깎는 함수
-    {
-        CmdReduceHP(damage);
-    }
-
-    void CmdReduceHP(int damage)
-    {
-        if (HP > damage)
-            HP -= damage;
-        else
-            HP = 0;
-    }
-
     void CmdFire()
     {
         try
@@ -457,6 +444,20 @@ public class Player_Control : NetworkBehaviour
             Hitted_Bullet(damage_Reducing(player_pos, bullet_pos, 10));
 
         }
+    }
+
+
+    public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수 피 깎는 함수
+    {
+        CmdReduceHP(damage);
+    }
+
+    void CmdReduceHP(int damage)
+    {
+        if (HP > damage)
+            HP -= damage;
+        else
+            HP = 0;
     }
 
     int damage_Reducing(Vector3 player_pos, Vector3 bullet_pos, int damage)

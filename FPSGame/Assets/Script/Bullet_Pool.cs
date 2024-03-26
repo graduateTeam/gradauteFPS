@@ -69,7 +69,6 @@ public class Bullet_Pool : NetworkBehaviour
     {
         // 총알을 비활성화
         bullet.gameObject.name = "bullet";  //비활성화 되는 순간 플레이어의 총알에서 그냥 총알로 변환
-        Debug.Log("Bullet name 원래대로: " + bullet.gameObject.name);
         bullet.SetActive(false);
         bulletPool.Enqueue(bullet);
     }
