@@ -102,7 +102,6 @@ public class WeaponAssaultRifle : MonoBehaviour
     {
         if (this != null)
         {
-            Debug.Log("�̺�Ʈ ����");
             onAmmoEvent.RemoveListener(OnAmmoCharged);
         }
     }
