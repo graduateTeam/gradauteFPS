@@ -790,8 +790,10 @@ MonoBehaviour:
   rb_player: {fileID: 7281644122917542065}
   rb_weapon: {fileID: 3273686764345870477}
   Feet: {fileID: 8890194204043568584}
-  gameManager: {fileID: 0}
-  bullet_Control: {fileID: 0}
+  bc: {fileID: 0}
+  gm: {fileID: 0}
+  playerCam: {fileID: 1284762056278986966}
+  mainCam: {fileID: 0}
   canFire: 1
 --- !u!114 &7531913799669259241
 MonoBehaviour:
@@ -1559,12 +1561,12 @@ GameObject:
   - component: {fileID: 603086378638769362}
   - component: {fileID: 3608881168087932103}
   m_Layer: 7
-  m_Name: Main Camera
-  m_TagString: Untagged
+  m_Name: playerCamera
+  m_TagString: PlayerCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3671408740542501829
 Transform:
   m_ObjectHideFlags: 0
@@ -1616,7 +1618,7 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: -1
+  m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295

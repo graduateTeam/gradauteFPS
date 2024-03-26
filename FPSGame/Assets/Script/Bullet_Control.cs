@@ -82,7 +82,6 @@ public class Bullet_Control : NetworkBehaviour
         gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
     }
 
-
     void Awake()
     {
         if (isServer)
