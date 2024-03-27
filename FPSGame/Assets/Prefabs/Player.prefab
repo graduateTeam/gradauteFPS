@@ -538,7 +538,7 @@ GameObject:
   - component: {fileID: 2877340906756341957}
   m_Layer: 7
   m_Name: Mouth(whole)
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -720,7 +720,7 @@ GameObject:
   - component: {fileID: 1000238008343787586}
   m_Layer: 7
   m_Name: Eyes
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1636,6 +1636,7 @@ MonoBehaviour:
   rb_player: {fileID: 5838064515702829384}
   rb_weapon: {fileID: 5685436817879853350}
   Feet: {fileID: 8651077889297736909}
+  hitEffectPrefab: {fileID: 4787537817579837633, guid: e96ebc15036037142aa22ce97cd7d73b, type: 3}
   bc: {fileID: 0}
   gm: {fileID: 0}
   playerCam: {fileID: 154303395717970167}
@@ -1848,7 +1849,7 @@ GameObject:
   - component: {fileID: 1030013526332652075}
   m_Layer: 7
   m_Name: Head
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2302,7 +2303,7 @@ GameObject:
   - component: {fileID: 67261939251720016}
   m_Layer: 7
   m_Name: Feet
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

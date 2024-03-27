@@ -3852,9 +3852,10 @@ MonoBehaviour:
   authenticator: {fileID: 0}
   playerPrefab: {fileID: 7143459289449910164, guid: d9c07d8ac04f01a4db861fea5fdcc250, type: 3}
   autoCreatePlayer: 1
-  playerSpawnMethod: 0
+  playerSpawnMethod: 1
   spawnPrefabs:
-  - {fileID: 790916204578897456, guid: e7bb071102ef2424fabf52071da11e1f, type: 3}
+  - {fileID: 3652571757206238056, guid: 1f404686026f2a14a8c873e707ff3129, type: 3}
+  - {fileID: 632630565278601747, guid: e7bb071102ef2424fabf52071da11e1f, type: 3}
   snapshotSettings:
     bufferTimeMultiplier: 2
     bufferLimit: 32
@@ -3875,7 +3876,7 @@ MonoBehaviour:
   GameplayScene: Assets/Scenes/Gameplay.unity
   _allPlayersReady: 0
   roomSlots: []
-  clientIndex: 1
+  clientIndex: 0
 --- !u!4 &1890257274
 Transform:
   m_ObjectHideFlags: 0

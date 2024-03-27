@@ -19,7 +19,7 @@ public class Player_Control : NetworkBehaviour
     private Vector3 jumpDirection;
 
     [SyncVar]
-    public int HP;
+    public int HP = 100;
     [SyncVar]
     public float lim_Speed;
     [SyncVar]
@@ -57,9 +57,11 @@ public class Player_Control : NetworkBehaviour
     public Camera playerCam;
     public Camera mainCam;
 
-    public bool canFire;
+    public NetworkIdentity playerIdentity { get; set; }
 
-    //NetworkServer가 제대로 세워지지 않는게 gm과 bc의 부재로 보인다.
+
+    [SyncVar]
+    public bool canFire;
     private void Start()
     {
         AssaultRifle = GetComponentInChildren<WeaponAssaultRifle>();
@@ -70,7 +72,7 @@ public class Player_Control : NetworkBehaviour
             getInstance();
             Game_Setting(Attack_point);
         }
-        
+
     }
 
     void FixedUpdate()
@@ -149,60 +151,72 @@ public class Player_Control : NetworkBehaviour
 
     float CalculateJumpVerticalSpeed() { return Mathf.Sqrt(2 * 2 * Physics.gravity.magnitude); }
 
-    private void player_movement()  //Player's Movement Function
+    private void player_movement()  //플레이어 움직임 함수
     {
         if (!isLocalPlayer) return;
 
-        Vector3 vec = Vector3.zero; //Reset location 
+        Vector3 vec;
 
         if (alive)
         {
-            if (!moving)
-            {
-                moving = true;
-                recoilAmount *= 1.5f;
-                recoilRecoverySpeed *= 0.8f;
-            }
-            if (isOwned && moving)
+            if (wasd)
             {
                 float Horizontal_move = Input.GetAxis("Horizontal");
                 float Vertical_move = Input.GetAxis("Vertical");
-                Vector3 moveDirection = (transform.right * Horizontal_move + new Vector3(Head.transform.forward.x, 0, Head.transform.forward.z) * Vertical_move).normalized;
+
+                Vector3 forwardMovement = Head.transform.forward.normalized * Vertical_move;
+                Vector3 rightMovement = Head.transform.right.normalized * Horizontal_move;
+                Vector3 moveDirection = (forwardMovement + rightMovement).normalized;
+                moveDirection.y = 0; // Y축 이동 제거, 플레이어가 상하로 움직이지 않도록 합니다.
                 vec = moveDirection * speed * Time.deltaTime;
 
-                rb_player.AddForce(vec, ForceMode.Impulse);
-                rb_player.velocity = Vector3.ClampMagnitude(rb_player.velocity, lim_Speed);
-                jumpDirection = Vector3.zero;
 
-                if (!isJump && Input.GetButton("Jump"))
+                if (!moving)
                 {
-                    isJump = true;
-                    //wasd = false; ::Useless code::
-                    vec = new Vector3(jumpDirection.x, jumpPower, jumpDirection.z) * speed * Time.deltaTime;
-                    if (!moving)
-                    {
-                        moving = true;
-                        recoilAmount *= 1.5f;
-                        recoilRecoverySpeed *= 0.8f;
-                    }
+                    moving = true;
+                    recoilAmount *= 1.5f;
+                    recoilRecoverySpeed *= 0.8f;
+                }
+                if (isOwned)
+                {
                     rb_player.AddForce(vec, ForceMode.Impulse);
-                }
-                else
-                {
-                    moving = false;
-                }
-
-                if (Input.GetButton("Fire1"))
-                {
-                    if (isOwned && NetworkClient.ready && canFire)
-                    {
-                        CmdFire();
-                    }
+                    rb_player.velocity = Vector3.ClampMagnitude(rb_player.velocity, lim_Speed);
+                    jumpDirection = Vector3.zero;
                 }
             }
             else
             {
                 moving = false;
+            }
+
+            if (!isJump && Input.GetButton("Jump"))
+            {
+                isJump = true;
+                wasd = false;
+                vec = new Vector3(jumpDirection.x, jumpPower, jumpDirection.z) * speed * Time.deltaTime;
+                if (!moving)
+                {
+                    moving = true;
+                    recoilAmount *= 1.5f;
+                    recoilRecoverySpeed *= 0.8f;
+                }
+                if (isOwned)
+                {
+                    rb_player.AddForce(vec, ForceMode.Impulse);
+                }
+            }
+            else
+            {
+                moving = false;
+            }
+
+            if (Input.GetButton("Fire1"))
+            {
+                if (isLocalPlayer && NetworkClient.ready && canFire)
+                {
+                    Debug.Log("Movement Fire!"+isOwned);
+                    CmdFire();
+                }
             }
         }
     }
@@ -230,16 +244,33 @@ public class Player_Control : NetworkBehaviour
         }
     }
 
+    [Command]
     void CmdFire()
     {
         try
         {
+            if (!canFire) return;
+
+            Debug.Log("CmdFire Shoot!");
+            bc.Bullet_Shoot();
+            canFire = false;
             StartCoroutine("Weapon_delay");
+
         }
-        catch (Exception e)
+        catch(Exception e)
         {
-            Debug.LogError(e);
+            if (bc == null)
+                Debug.LogError("CmdFire bc is null");
+
+            Debug.LogError(e.Message);
         }
+        
+    }
+
+    IEnumerator Weapon_delay()
+    {
+        yield return new WaitForSeconds(attackRate);
+        canFire = true;
     }
 
     //[ClientRpc]
@@ -276,23 +307,6 @@ public class Player_Control : NetworkBehaviour
             RpcRespawn();
         }
     }*/
-
-    IEnumerator Weapon_delay()
-    {
-        canFire = false;
-
-        try
-        {
-            bc.Bullet_Shoot();
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e);
-        }
-
-        yield return new WaitForSeconds(attackRate);
-        canFire = true;
-    }
 
     private void Rotate()
     {
@@ -353,12 +367,12 @@ public class Player_Control : NetworkBehaviour
 
     }
 
-    private void Game_Setting(GameObject Attack_Object)
+    public void Game_Setting(GameObject Attack_Object)
     {
         canFire = true;
 
         rb_player = Attack_Object.GetComponent<Rigidbody>();
-        rb_weapon = Attack_Object.GetComponent<Rigidbody>();
+        rb_weapon = AssaultRifle.GetComponentInChildren<Rigidbody>();
 
         Scene gameScene = SceneManager.GetActiveScene();
 
@@ -381,16 +395,9 @@ public class Player_Control : NetworkBehaviour
             }
         }
 
-        
-       /* // 카메라 설정 부분
-        if (Attack_Object.CompareTag("Player")) // NetworkIdentity를 사용하여 로컬 플레이어인지 확인합니다.
-        {
-            
-        }*/
-
     }
 
-    private void getInstance()
+    public void getInstance()
     {
         // GameManager가 준비될 때까지 기다리는 코루틴 시작
         StartCoroutine(WaitForGameManager());
@@ -445,7 +452,6 @@ public class Player_Control : NetworkBehaviour
 
         }
     }
-
 
     public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수 피 깎는 함수
     {

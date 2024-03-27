@@ -1,4 +1,5 @@
 ﻿using Mirror;
+using System;
 using UnityEngine;
 
 public class Bullet_Control : NetworkBehaviour
@@ -8,6 +9,7 @@ public class Bullet_Control : NetworkBehaviour
     public static Bullet_Control instance;
     public static GameManager gm_instance;
 
+    [SyncVar]
     public Vector3 gunEndPos;
 
     [Header("WeaponAssault")]
@@ -15,7 +17,10 @@ public class Bullet_Control : NetworkBehaviour
     public WeaponAssaultRifle weapon;
     // Start is called before the first frame update
 
+    [SyncVar]
     private float attackDis;
+
+    [SyncVar]
     private float attackSpd;
 
     public GameObject player;
@@ -93,12 +98,14 @@ public class Bullet_Control : NetworkBehaviour
         gm_instance = GameManager.instance;
 
         gm_instance.AimPos(gunEndPos);
+
     }
 
     private void Update()
     {
         gm_instance.AimPos(gunEndPos);
     }
+   
     private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.tag != "bullet" && collision.gameObject.name != "Weapon")
@@ -119,8 +126,6 @@ public class Bullet_Control : NetworkBehaviour
 
         if (!weapon.canShoot) return;
 
-        GameObject bullet = bp.GetBullet();
-
         RaycastHit hit;
         Vector3 targetPoint = Vector3.zero;
 
@@ -139,17 +144,13 @@ public class Bullet_Control : NetworkBehaviour
 
         Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
 
-        
         Vector3 attackDirection = Head.transform.forward;
 
-        
-        bullet.transform.position = gunEndPos;
+        var LookDirection = Quaternion.LookRotation(attackDirection);
 
-        
-        bullet.transform.rotation = Quaternion.LookRotation(attackDirection);
+        Vector3 velo = attackDirection * attackSpd;
 
-        
-        bullet.GetComponent<Rigidbody>().velocity = attackDirection * attackSpd;
+        bp.GetBullet(gunEndPos, LookDirection, velo);
 
         if (Physics.Raycast(gunEndPos, attackDirection, out hit, 1000))
         {
@@ -157,4 +158,5 @@ public class Bullet_Control : NetworkBehaviour
         }
 
     }
+
 }
