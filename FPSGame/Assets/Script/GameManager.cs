@@ -6,8 +6,10 @@ using Mirror;
 /*
 * UI관련 및 Map 좌표 정리 등등...
 */
-public class GameManager : NetworkBehaviour
+public class GameManager : MonoBehaviour
 {
+    public int Data { get; set; }
+
     public Image HP_bar;
     public TextMeshProUGUI HP_text;
     //public Image Respawn_bar;
@@ -27,6 +29,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField]
     private WeaponAssaultRifle weapon;
 
+
     [Header("Magazine")]
     [SerializeField]
     private Transform magazineParent;   //탄창 UI가 배치되는 Panel
@@ -38,14 +41,10 @@ public class GameManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (instance != null && instance != this)
-        {
-            Debug.LogError("Multiple instances of GameManager detected.");
-        }
-        else
+        if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); // 게임 매니저가 씬 전환 시 파괴되지 않도록 함
         }
 
         Cursor.lockState = CursorLockMode.Locked;

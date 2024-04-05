@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using System.Reflection;
-using Unity.VisualScripting;
-using JetBrains.Annotations;
 
 public class OSOPRoomManager : NetworkRoomManager
 {
@@ -29,6 +26,7 @@ public class OSOPRoomManager : NetworkRoomManager
     {
         if (IsAllPlayersReady())
         {
+            Debug.LogError("I'm Server activate Game!");
             // 플레이어 위치 설정
             SetAllPlayersPosition();
 

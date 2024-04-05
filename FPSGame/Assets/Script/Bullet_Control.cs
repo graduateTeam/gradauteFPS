@@ -1,10 +1,14 @@
 ﻿using Mirror;
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Bullet_Control : NetworkBehaviour
 {
-    public Bullet_Pool bp;
+    public int Data { get; set; }
+
+    [SerializeField]
+    private Bullet_Pool bp;
 
     public static Bullet_Control instance;
     public static GameManager gm_instance;
@@ -27,17 +31,18 @@ public class Bullet_Control : NetworkBehaviour
     public GameObject Head;
     public Rigidbody rb_weapon;
 
-    public override void OnStartServer()
+   public override void OnStartServer()
     {
         if (instance == null)
         {
             instance = this;
-            Debug.Log("Bullet_Control instance activate Server!");
+            DontDestroyOnLoad(gameObject); // 게임 매니저가 씬 전환 시 파괴되지 않도록 함
         }
-        else
-        {
-            Debug.Log("Bullet_Control instance Already exist Server!");
-        }
+
+        bp = Bullet_Pool.instance;
+        gm_instance = GameManager.instance;
+
+        gm_instance.AimPos(gunEndPos);
     }
 
     public override void OnStartClient()
@@ -45,12 +50,13 @@ public class Bullet_Control : NetworkBehaviour
         if (instance == null)
         {
             instance = this;
-            Debug.Log("Bullet_Control instance activate Client!");
+            DontDestroyOnLoad(gameObject); // 게임 매니저가 씬 전환 시 파괴되지 않도록 함
         }
-        else
-        {
-            Debug.Log("Bullet_Control instance Already exist Client!");
-        }
+
+        bp = Bullet_Pool.instance;
+        gm_instance = GameManager.instance;
+
+        gm_instance.AimPos(gunEndPos);
     }
 
     public void getFromPC(GameObject player)
@@ -87,7 +93,12 @@ public class Bullet_Control : NetworkBehaviour
         gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
     }
 
-    void Awake()
+    private void Awake()
+    {
+        //playerPrefab.GetComponent<Player_Control>().getBC(GetComponent<Bullet_Control>());
+    }
+
+    /*void Awake()
     {
         if (isServer)
             OnStartServer();
@@ -99,7 +110,7 @@ public class Bullet_Control : NetworkBehaviour
 
         gm_instance.AimPos(gunEndPos);
 
-    }
+    }*/
 
     private void Update()
     {

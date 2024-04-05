@@ -1636,7 +1636,6 @@ MonoBehaviour:
   rb_player: {fileID: 5838064515702829384}
   rb_weapon: {fileID: 5685436817879853350}
   Feet: {fileID: 8651077889297736909}
-  hitEffectPrefab: {fileID: 4787537817579837633, guid: e96ebc15036037142aa22ce97cd7d73b, type: 3}
   bc: {fileID: 0}
   gm: {fileID: 0}
   playerCam: {fileID: 154303395717970167}
@@ -2794,7 +2793,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 736a6ee94d8a94aef925851d18125a0c, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

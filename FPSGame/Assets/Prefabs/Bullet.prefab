@@ -152,6 +152,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   bp: {fileID: 0}
+  gm: {fileID: 0}
+  playerPrefab: {fileID: 7143459289449910164, guid: d9c07d8ac04f01a4db861fea5fdcc250, type: 3}
   gunEndPos: {x: 0, y: 0, z: 0}
   weapon: {fileID: 0}
   player: {fileID: 0}

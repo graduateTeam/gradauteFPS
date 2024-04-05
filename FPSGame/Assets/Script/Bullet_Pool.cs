@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 /*총의 오브젝트 풀이 생성되지 않는 것이 문제*/
 public class Bullet_Pool : NetworkBehaviour
@@ -21,32 +22,38 @@ public class Bullet_Pool : NetworkBehaviour
         if (instance == null)
         {
             instance = this;
-            Debug.Log("Bullet_Pool instance activated");
-            // 씬 전환 시 파괴되지 않도록 설정 (선택사항)
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Debug.Log("Another Bullet_Pool instance found. Destroying...");
+            DontDestroyOnLoad(gameObject); // 게임 매니저가 씬 전환 시 파괴되지 않도록 함
         }
 
         bulletPool = new Queue<GameObject>();
+        pool_spawn();
     }
 
-    //[Command]
-    public void GetBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
+    private void SpawnBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
     {
         if (bulletPool.Count > 0)
         {
             GameObject bullet = bulletPool.Dequeue();
-            bullet.SetActive(true); // 총알을 활성화
+            bullet.SetActive(true);
             bullet.transform.position = pos;
             bullet.transform.rotation = rotation;
             bullet.GetComponent<Rigidbody>().velocity = velocity;
+        }
+    }
 
+    [ClientRpc]
+    public void RpcSpawnBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
+    {
+        SpawnBullet(pos, rotation, velocity);
+    }
 
-            NetworkServer.Spawn(bullet);
-            //bulletPool.Enqueue(bullet); // Put it back for reuse
+    public void GetBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
+    {
+        if (isServer)
+        {
+            SpawnBullet(pos, rotation, velocity);
+            NetworkServer.Spawn(bulletPool.Peek());
+            RpcSpawnBullet(pos, rotation, velocity);
         }
     }
 
@@ -72,4 +79,10 @@ public class Bullet_Pool : NetworkBehaviour
         }
     }
 
+    public bool Bp_isEmpty()
+    {
+        if (bulletPool == null) return true;
+
+        return false;
+    }
 }

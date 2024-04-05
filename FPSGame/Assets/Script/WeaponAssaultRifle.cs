@@ -9,8 +9,6 @@ public class WeaponAssaultRifle : MonoBehaviour
 {
     public Weapon_Info WeaponInfo { get; set; }
 
-    private Bullet_Control bc;
-
     [HideInInspector]
     public AmmoEvent onAmmoEvent = new AmmoEvent();
 
@@ -35,16 +33,12 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void Awake()
     {
-        //ó�� ź�� ���� �ִ�� ����
         weaponInfo.currentAmmo = weaponInfo.maxAmmo;
 
         GameManager.instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
         GameManager.instance.getGunLabel(WeaponInfo.weaponName);
 
         canShoot = true;
-        bc = Bullet_Control.instance;
-
-        audioSource = GetComponent<AudioSource>();
     }
 
     public float[] giveToPC()
@@ -77,7 +71,7 @@ public class WeaponAssaultRifle : MonoBehaviour
 
     private void OnEnable()
     {
-        PlaySound(audioClipTakeOutWeapon);
+        //PlaySound(audioClipTakeOutWeapon);
 
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
 
@@ -133,9 +127,6 @@ public class WeaponAssaultRifle : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        isReload = false;
-        canShoot = true;
-
         int addAmmo = (weaponInfo.maxAmmo - weaponInfo.currentAmmo);
 
         if (addAmmo > weaponInfo.wholeAmmo)
@@ -151,6 +142,11 @@ public class WeaponAssaultRifle : MonoBehaviour
 
         onAmmoEvent.Invoke(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
         GameManager.instance.UpdateMagazineHUD(weaponInfo.currentAmmo, weaponInfo.wholeAmmo);
+
+
+        isReload = false;
+        canShoot = true;
+
 
         /*while (true)
         {
