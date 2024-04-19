@@ -1,5 +1,6 @@
 ﻿using Mirror;
 using System;
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -27,39 +28,34 @@ public class Bullet_Control : NetworkBehaviour
     [SyncVar]
     private float attackSpd;
 
-    public GameObject player;
     public GameObject Head;
     public Rigidbody rb_weapon;
 
-   public override void OnStartServer()
+    public void setWeaponInfo(GameObject Head, WeaponAssaultRifle weapon)
     {
-        if (instance == null)
+        this.Head = Head;
+        this.weapon = weapon; // WeaponAssaultRifle 컴포넌트 저장
+
+        if (weapon != null)
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject); // 게임 매니저가 씬 전환 시 파괴되지 않도록 함
+            rb_weapon = weapon.GetComponentInChildren<Rigidbody>();
+
+            float[] receive = weapon.Gun_Info();
+            attackDis = receive[0];
+            attackSpd = receive[1];
+
+            Renderer renderer = rb_weapon.GetComponent<Renderer>();
+            float localZOffset = rb_weapon.transform.InverseTransformPoint(renderer.bounds.center).z;
+
+            gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
         }
-
-        bp = Bullet_Pool.instance;
-        gm_instance = GameManager.instance;
-
-        gm_instance.AimPos(gunEndPos);
+        else
+        {
+            Debug.LogError("WeaponAssaultRifle is null");
+        }
     }
 
-    public override void OnStartClient()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject); // 게임 매니저가 씬 전환 시 파괴되지 않도록 함
-        }
-
-        bp = Bullet_Pool.instance;
-        gm_instance = GameManager.instance;
-
-        gm_instance.AimPos(gunEndPos);
-    }
-
-    public void getFromPC(GameObject player)
+    /*public void getFromPC(GameObject player)
     {
         foreach (Transform child in player.transform)
         {
@@ -91,26 +87,27 @@ public class Bullet_Control : NetworkBehaviour
         float localZOffset = rb_weapon.transform.InverseTransformPoint(renderer.bounds.center).z;
 
         gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
+    }*/
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject); // 게임 매니저가 씬 전환 시 파괴되지 않도록 함
+        }
     }
 
-    private void Awake()
+    private void Start()
     {
-        //playerPrefab.GetComponent<Player_Control>().getBC(GetComponent<Bullet_Control>());
-    }
-
-    /*void Awake()
-    {
-        if (isServer)
-            OnStartServer();
-        else
-            OnStartClient();
-
         bp = Bullet_Pool.instance;
         gm_instance = GameManager.instance;
 
         gm_instance.AimPos(gunEndPos);
 
-    }*/
+        if (bp == null)
+            Debug.LogError("Bullet_Controll bp is null");
+    }
 
     private void Update()
     {
@@ -126,7 +123,7 @@ public class Bullet_Control : NetworkBehaviour
 
     }
 
-    public void Bullet_Shoot()
+    /*public void Bullet_Shoot()
     {
         if (weapon == null)
         {
@@ -135,7 +132,7 @@ public class Bullet_Control : NetworkBehaviour
         }
         weapon.UseAmmo();
 
-        if (!weapon.canShoot) return;
+        if (!weapon.canShoot) return ;
 
         RaycastHit hit;
         Vector3 targetPoint = Vector3.zero;
@@ -161,13 +158,115 @@ public class Bullet_Control : NetworkBehaviour
 
         Vector3 velo = attackDirection * attackSpd;
 
-        bp.GetBullet(gunEndPos, LookDirection, velo);
+        if (bp != null)
+        {
+            var bullet = bp.GetBullet(gunEndPos, LookDirection, velo);
+            // 생성된 총알 정보를 클라이언트에게 동기화 추가된 부분 0410
+            StartCoroutine(SyncBulletAfterSpawn(bullet, LookDirection, velo));
+        }
+        else
+        {
+            Debug.LogError("bp is null in Bullet_Shoot");
+        }
 
         if (Physics.Raycast(gunEndPos, attackDirection, out hit, 1000))
         {
 
         }
 
+    }*/
+   /* public GameObject Bullet_Shoot()    //0418 bp의 부재를 해결해야한다.
+    {
+        if (weapon == null)
+        {
+            Debug.LogError("Weapon is null!");
+            return null;
+        }
+
+        //weapon.UseAmmo();
+        if (!weapon.canShoot) return null;
+
+        RaycastHit hit;
+        Vector3 targetPoint = Vector3.zero;
+        Ray oldray = Camera.main.ViewportPointToRay(Vector2.one * 0.5f);
+        Ray ray = new Ray(rb_weapon.transform.position, Head.transform.rotation * oldray.direction);
+
+        if (Physics.Raycast(ray, out hit, 1000))
+        {
+            targetPoint = hit.point;
+        }
+        else
+        {
+            targetPoint = ray.origin + ray.direction * attackDis;
+        }
+
+        Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
+
+        Vector3 attackDirection = Head.transform.forward;
+        var LookDirection = Quaternion.LookRotation(attackDirection);
+        Vector3 velo = attackDirection * attackSpd;
+
+        GameObject returnValue = null;
+
+        try
+        {
+            var bullet = bp.GetBullet(gunEndPos, LookDirection, velo);
+            SyncBulletAfterSpawn(bullet, LookDirection, velo);
+            returnValue = bullet;
+
+        }catch(Exception ex)
+        {
+            Debug.LogException(ex);
+
+            if(bp == null)
+            {
+                Debug.LogError("bp is null in Bullet_Shoot");
+                returnValue = null;
+            }
+
+        }
+
+        return returnValue;
+    }*/
+
+    private void SyncBulletAfterSpawn(GameObject bullet, Quaternion LookDirection, Vector3 velo)
+    {
+        NetworkIdentity bulletIdentity = bullet.GetComponent<NetworkIdentity>();
+
+        if (bullet != null)
+        {
+            GameObject playerObject = OSOPRoomManager.singleton.playerPrefab;
+            if (playerObject != null)
+            {
+                Player_Control pc = playerObject.GetComponent<Player_Control>();
+                if (pc != null)
+                {
+                    pc.RpcSyncBullet(bulletIdentity.netId, gunEndPos, LookDirection, velo);
+                }
+                else
+                {
+                    Debug.LogError("Player_Control component not found on playerPrefab");
+                }
+            }
+            else
+            {
+                Debug.LogError("playerPrefab is null in OSOPRoomManager.singleton");
+            }
+        }
     }
 
+    public void setPlayerControl(Player_Control pc)
+    {
+        pc.setBulletControl(this);
+    }
+
+    public void setGameManager()
+    {
+        gm_instance = GameManager.instance;
+    }
+
+    public void setBulletPool(Bullet_Pool bulletPool)
+    {
+        bp = bulletPool;
+    }
 }

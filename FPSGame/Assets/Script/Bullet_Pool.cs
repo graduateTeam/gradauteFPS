@@ -29,12 +29,26 @@ public class Bullet_Pool : NetworkBehaviour
         pool_spawn();
     }
 
-    private void SpawnBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
+    /*private void SpawnBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
     {
         if (bulletPool.Count > 0)
         {
             GameObject bullet = bulletPool.Dequeue();
             bullet.SetActive(true);
+
+            // 컴포넌트 가져오기
+            var bulletControl = bullet.GetComponent<Bullet_Control>();
+            var pc = OSOPRoomManager.singleton.playerPrefab.GetComponent<Player_Control>();
+            if (bulletControl != null)
+            {
+                bulletControl.setBulletPool();
+                bulletControl.setWeaponInfo(pc.Head, pc.AssaultRifle);
+            }
+            else
+            {
+                Debug.Log("Bullet_Control is null");
+            }
+
             bullet.transform.position = pos;
             bullet.transform.rotation = rotation;
             bullet.GetComponent<Rigidbody>().velocity = velocity;
@@ -45,9 +59,9 @@ public class Bullet_Pool : NetworkBehaviour
     public void RpcSpawnBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
     {
         SpawnBullet(pos, rotation, velocity);
-    }
+    }*/
 
-    public void GetBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
+    /*public void GetBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
     {
         if (isServer)
         {
@@ -55,6 +69,31 @@ public class Bullet_Pool : NetworkBehaviour
             NetworkServer.Spawn(bulletPool.Peek());
             RpcSpawnBullet(pos, rotation, velocity);
         }
+    }*/
+    public GameObject GetBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
+    {
+        if (isServer)
+        {
+            if (bulletPool.Count > 0)
+            {
+                GameObject bullet = bulletPool.Dequeue();
+                bullet.SetActive(true);
+                bullet.transform.position = pos;
+                bullet.transform.rotation = rotation;
+                bullet.GetComponent<Rigidbody>().velocity = velocity;
+
+                /*NetworkIdentity bulletIdentity = bullet.GetComponent<NetworkIdentity>();
+                if (!bulletIdentity.isServer && !bulletIdentity.isClient)
+                {
+                    NetworkServer.Spawn(bullet);
+                }*/
+                //RpcSpawnBullet(bullet.GetComponent<NetworkIdentity>().netId, pos, rotation, velocity);
+
+                return bullet;
+            }
+        }
+
+        return null;
     }
 
 
@@ -72,6 +111,18 @@ public class Bullet_Pool : NetworkBehaviour
             GameObject bullet = Instantiate(bulletPrefab);
             bullet.SetActive(true);
 
+            Bullet_Control bulletControl = bullet.GetComponent<Bullet_Control>();
+
+            if (bulletControl != null)
+            {
+                bulletControl.setBulletPool(this);
+                bulletControl.setGameManager();
+            }
+            else
+            {
+                Debug.LogError("Bullet_Control component not found on bullet prefab");
+            }
+
             //NetworkServer.Spawn(bullet);
 
             bulletPool.Enqueue(bullet);
@@ -84,5 +135,10 @@ public class Bullet_Pool : NetworkBehaviour
         if (bulletPool == null) return true;
 
         return false;
+    }
+
+    public void setPlayerControl(Player_Control pc)
+    {
+        pc.setBulletPool(this);
     }
 }

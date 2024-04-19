@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour
 
     public void HP_UI_Update(int hp)
     {
-        if(HP_bar.gameObject.activeSelf)
+        if (HP_bar.gameObject.activeSelf)
         {
             HP_bar.fillAmount = hp / 100f;
             HP_text.text = string.Format("{0} / 100", hp);
@@ -115,12 +115,12 @@ public class GameManager : MonoBehaviour
         minute = Mathf.Floor(minute);
         second = Mathf.Floor(second);
 
-        return new float[] {minute, second};
+        return new float[] { minute, second };
     }
 
     public int[] Who_kill(string team) //누군가 죽이면 킬 수 올리기
     {
-        if(team.Equals("red"))
+        if (team.Equals("red"))
         {
             Red_kill += 1;
         }
@@ -129,15 +129,25 @@ public class GameManager : MonoBehaviour
             Blue_kill += 1;
         }
 
-        return new int[] {Red_kill, Blue_kill};
+        return new int[] { Red_kill, Blue_kill };
     }
 
     public Boolean Time_isMinus()
     {
-        if (gameTime < 1) 
+        if (gameTime < 1)
             return true;
         else
             return false;
+    }
+
+    public void setPlayerControl(Player_Control pc)
+    {
+        pc.setGameManager(this);
+    }
+
+    public void setBulletControl(Bullet_Control bc)
+    {
+        bc.setGameManager();
     }
 }
 

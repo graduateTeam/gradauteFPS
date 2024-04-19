@@ -1637,10 +1637,12 @@ MonoBehaviour:
   rb_weapon: {fileID: 5685436817879853350}
   Feet: {fileID: 8651077889297736909}
   bc: {fileID: 0}
+  bp: {fileID: 7128443624517023840, guid: 1f404686026f2a14a8c873e707ff3129, type: 3}
   gm: {fileID: 0}
   playerCam: {fileID: 154303395717970167}
   mainCam: {fileID: 0}
   canFire: 1
+  gunEndPos: {x: 0, y: 0, z: 0}
 --- !u!114 &3299731197502069994
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using System;
 using JetBrains.Annotations;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
+using UnityEngine.UIElements;
 
 public class Player_Control : NetworkBehaviour
 {
@@ -53,6 +54,9 @@ public class Player_Control : NetworkBehaviour
     private Bullet_Control bc;
 
     [SerializeField]
+    private Bullet_Pool bp;
+
+    [SerializeField]
     private GameManager gm;
 
     public Camera playerCam;
@@ -63,6 +67,14 @@ public class Player_Control : NetworkBehaviour
     [SyncVar]
     public bool canFire;
 
+    [SyncVar]
+    public Vector3 gunEndPos;
+
+    [SyncVar]
+    private float attackDis;
+
+    [SyncVar]
+    private float attackSpd;
 
     //0404 클라이언트의 bc와 gm이 여전히 null이다.
     private void Start()
@@ -73,8 +85,30 @@ public class Player_Control : NetworkBehaviour
         if(isLocalPlayer)
         {
             Game_Setting(Attack_point);
+            InitializeWeapon();
         }
 
+    }
+
+    private void InitializeWeapon()
+    {
+        if (AssaultRifle != null)
+        {
+            rb_weapon = AssaultRifle.GetComponentInChildren<Rigidbody>();
+
+            float[] receive = AssaultRifle.Gun_Info();
+            attackDis = receive[0];
+            attackSpd = receive[1];
+
+            Renderer renderer = rb_weapon.GetComponent<Renderer>();
+            float localZOffset = rb_weapon.transform.InverseTransformPoint(renderer.bounds.center).z;
+
+            gunEndPos = rb_weapon.transform.position + rb_weapon.transform.forward * localZOffset;
+        }
+        else
+        {
+            Debug.LogError("AssaultRifle is null");
+        }
     }
 
     void FixedUpdate()
@@ -118,17 +152,14 @@ public class Player_Control : NetworkBehaviour
             origin_recoilRecoverySpeed = recoilRecoverySpeed;
         }
 
-        if (bc == null)
-            Debug.LogWarning("Player_Control bc is null");
-
         if (gm == null)
             Debug.LogWarning("Player_Control gm is null");
 
         if (gm != null)
             gm.HP_UI_Update(HP);
 
-        if (bc != null)
-            bc.getFromPC(Attack_point);
+        if(bc != null)
+            bc.setWeaponInfo(Head, AssaultRifle);
     }
 
     public void Rebound()   //반동함수
@@ -214,10 +245,11 @@ public class Player_Control : NetworkBehaviour
 
             if (Input.GetButton("Fire1"))
             {
-                if (isLocalPlayer && canFire)
+                if (isLocalPlayer && canFire && NetworkClient.ready)
                 {
                     Debug.Log("Movement Fire!"+isOwned);
-                    CmdFire();
+                    //CmdFire();
+                    Bullet_Shoot();
                 }
             }
         }
@@ -243,10 +275,12 @@ public class Player_Control : NetworkBehaviour
         if(isLocalPlayer)
         {
             Debug.Log("I'm Client!");
+            CmdRequestComponents();
+            //NetworkClient.Ready();
         }
     }
 
-    [Command]
+    /*[Command]
     void CmdFire()  //일단 건들 일은 없어보임 0404
     {
         if (bc == null)
@@ -255,38 +289,108 @@ public class Player_Control : NetworkBehaviour
             return;
         }
 
-        RpcFire();
+        Debug.Log("CmdFire Shoot!");
+        bc.Bullet_Shoot();
+        canFire = false;
+        StartCoroutine("Weapon_delay");
+    }*/
 
-    }
-
-    [ClientRpc]
-    void RpcFire()
+    /*[Command]
+    void CmdFire()
     {
         if (bc == null)
         {
-            Debug.LogError("RpcFire: bc is null");
+            Debug.LogError("CmdFire: bc is null");
             return;
         }
 
-        try
+        Debug.Log("CmdFire Shoot!");
+
+        GameObject bullet = bc.Bullet_Shoot();
+
+        if (bullet != null)
         {
-            if (!canFire) return;
-
-            Debug.Log("CmdFire Shoot!");
-            bc.Bullet_Shoot();
-            canFire = false;
-            StartCoroutine("Weapon_delay");
-
+            NetworkServer.Spawn(bullet);
         }
-        catch(Exception e)
+
+        canFire = false;
+        RpcWeaponDelay();
+        RpcDecreaseAmmoOnClients();
+    }*/
+
+    [Client]    //0418 총알발사 전면 교체 (주석처리 했음)
+    public void Bullet_Shoot()
+    {
+        Debug.LogError("Bullet_Shoot!!");
+
+        if (!isLocalPlayer || !canFire || !NetworkClient.ready) return;
+
+        if (AssaultRifle == null || !AssaultRifle.canShoot) return;
+
+        RaycastHit hit;
+        Vector3 targetPoint = Vector3.zero;
+        Ray oldray = Camera.main.ViewportPointToRay(Vector2.one * 0.5f);
+        Ray ray = new Ray(rb_weapon.transform.position, Head.transform.rotation * oldray.direction);
+
+        if (Physics.Raycast(ray, out hit, 1000))
         {
-            if (bc == null)
-                Debug.LogError("CmdFire bc is null");
-
-            Debug.LogError(e.Message);  //호스트에서 총알을 발사하는데 이게 왜 클라이언트에서 뜨지..?
+            targetPoint = hit.point;
         }
-        
+        else
+        {
+            targetPoint = ray.origin + ray.direction * attackDis;
+        }
+
+        Debug.DrawRay(ray.origin, ray.direction * attackDis, Color.red);
+
+        Vector3 attackDirection = Head.transform.forward;
+        Quaternion lookDirection = Quaternion.LookRotation(attackDirection);
+        Vector3 velocity = attackDirection * attackSpd;
+
+        InitializeWeapon();
+
+        CmdShootBullet(gunEndPos, lookDirection, velocity);
+
+        canFire = false;
+        StartCoroutine("Weapon_delay");
+        AssaultRifle.UseAmmo();
     }
+
+    [Command]
+    void CmdShootBullet(Vector3 pos, Quaternion rotation, Vector3 velocity)
+    {
+        if (bp == null)
+            Debug.LogError("총 발사 bp Error");
+
+        GameObject bullet = bp.GetBullet(pos, rotation, velocity);
+
+        if (bullet != null)
+        {
+            NetworkServer.Spawn(bullet);
+            RpcSyncBullet(bullet.GetComponent<NetworkIdentity>().netId, pos, rotation, velocity);
+        }
+    }
+
+    //추가된 부분 0410
+    [ClientRpc]
+    public void RpcSyncBullet(uint bulletNetId, Vector3 pos, Quaternion rotation, Vector3 velocity)
+    {
+        if (NetworkClient.spawned.TryGetValue(bulletNetId, out NetworkIdentity bulletIdentity))
+        {
+            GameObject bullet = bulletIdentity.gameObject;
+            bullet.transform.position = pos;
+            bullet.transform.rotation = rotation;
+            bullet.GetComponent<Rigidbody>().velocity = velocity;
+
+            Debug.LogError("RpcSyncBullet position: " + bullet.transform.position + " // rotation: " + bullet.transform.rotation
+                + " // velocity: " + bullet.GetComponent<Rigidbody>().velocity);
+        }
+        else
+        {
+            Debug.LogWarning($"Bullet with netId {bulletNetId} not found in NetworkClient.spawned");
+        }
+    }
+    
 
     IEnumerator Weapon_delay()
     {
@@ -355,18 +459,13 @@ public class Player_Control : NetworkBehaviour
 
     private void SpawnPlayer()
     {
-        Debug.LogError("SpawnPlayer 발동");
-
         try
         {
-            if (NetworkServer.active)
+            if (NetworkServer.active && NetworkClient.ready)
             {
-                Debug.LogError("서버가 제대로 설계되었다");
-
                 if(isServer)
                 {
                     OSOPRoomManager.GameStart();
-                    CmdGetInstances();
                 }
                     
 
@@ -414,37 +513,63 @@ public class Player_Control : NetworkBehaviour
 
     }
 
-    [Command]
+    /*[Command]
     private void CmdGetInstances()
     {
         if (GameManager.instance != null && Bullet_Control.instance != null)
         {
-            // GameManager와 Bullet_Control의 필요한 데이터 추출
-            int gameManagerData = GameManager.instance.Data;
-            int bulletControlData = Bullet_Control.instance.Data;
-            RpcSetInstances(gameManagerData, bulletControlData);
+            RpcSetInstances(GameManager.instance, Bullet_Control.instance);
         }
     }
 
     [ClientRpc]
-    private void RpcSetInstances(int gameManagerData, int bulletControlData)
+    private void RpcSetInstances(GameManager gameManagerInstance, Bullet_Control bulletControlInstance)
     {
-        if (!isOwned) return;
+        gm = gameManagerInstance;
+        bc = bulletControlInstance;
 
+        // 인스턴스를 받은 후에 필요한 로직 수행
+        gm.UI_Init();
+        moving = false;
+        bc.weapon = AssaultRifle;
+    }*/
+    [Command]
+    private void CmdRequestComponents()
+    {
         if (GameManager.instance != null && Bullet_Control.instance != null)
         {
-            // 전달받은 데이터를 사용하여 GameManager와 Bullet_Control 설정
-            gm = GameManager.instance;
-            gm.Data = gameManagerData;
-
-            bc = Bullet_Control.instance;
-            bc.Data = bulletControlData;
-
-            // 인스턴스를 받은 후에 필요한 로직 수행
-            gm.UI_Init();
-            moving = false;
-            bc.weapon = AssaultRifle;
+            GameManager.instance.setPlayerControl(this);
+            Bullet_Control.instance.setPlayerControl(this);
+            Bullet_Pool.instance.setPlayerControl(this);
+            RpcSetComponents();
         }
+    }
+
+    [ClientRpc]
+    private void RpcSetComponents()
+    {
+        if (!isServer)
+        {
+            gm = GameManager.instance;
+            bc = Bullet_Control.instance;
+        }
+    }
+
+    public void setGameManager(GameManager gameManager)
+    {
+        gm = gameManager;
+        gm.UI_Init();
+    }
+
+    public void setBulletControl(Bullet_Control bulletControl)
+    {
+        bc = bulletControl;
+        bc.weapon = AssaultRifle;
+    }
+
+    public void setBulletPool(Bullet_Pool bulletPool)
+    {
+        bp = bulletPool;
     }
 
     private void OnCollisionEnter(Collision collision)

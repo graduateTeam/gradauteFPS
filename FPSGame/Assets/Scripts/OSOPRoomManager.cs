@@ -74,7 +74,7 @@ public class OSOPRoomManager : NetworkRoomManager
             GameObject obj = Instantiate(bulletManager);
             NetworkServer.Spawn(obj);
 
-            obj.GetComponent<Bullet_Pool>().pool_spawn();
+            //obj.GetComponent<Bullet_Pool>().pool_spawn();
         }
         else
         {
