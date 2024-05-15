@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class OSOPRoomManager : NetworkRoomManager
 {
     // 플레이어가 준비되었는지 확인하기 위한 리스트
     private static List<NetworkConnectionToClient> readyPlayers = new List<NetworkConnectionToClient>();
+
 
     public override void OnServerConnect(NetworkConnectionToClient conn)
     {
@@ -48,6 +50,12 @@ public class OSOPRoomManager : NetworkRoomManager
             {
                 var player = conn.identity.gameObject;
                 player.transform.position = new Vector3(0, 0, 0); // 위치 설정 로직
+
+                if(player.GetComponent<NetworkIdentity>().isServer)   //0429 gm이 null인 이유
+                {
+                    player.GetComponent<Player_Control>().setPlayerNumber(readyPlayers.Count);
+                }
+
                 Debug.Log($"Player Name: {player.name}, NetID: {conn.identity.netId}, IsLocalPlayer: {conn.identity.isLocalPlayer}");
             }
             else

@@ -11,6 +11,8 @@ public class Player_Control : NetworkBehaviour
 {
     // Start is called before the first frame update
 
+    public int PlayerNumber;
+
     public bool alive;
     public bool isJump;
     public bool wasd;
@@ -87,7 +89,6 @@ public class Player_Control : NetworkBehaviour
             Game_Setting(Attack_point);
             InitializeWeapon();
         }
-
     }
 
     private void InitializeWeapon()
@@ -321,8 +322,6 @@ public class Player_Control : NetworkBehaviour
     [Client]    //0418 총알발사 전면 교체 (주석처리 했음)
     public void Bullet_Shoot()
     {
-        Debug.LogError("Bullet_Shoot!!");
-
         if (!isLocalPlayer || !canFire || !NetworkClient.ready) return;
 
         if (AssaultRifle == null || !AssaultRifle.canShoot) return;
@@ -381,9 +380,6 @@ public class Player_Control : NetworkBehaviour
             bullet.transform.position = pos;
             bullet.transform.rotation = rotation;
             bullet.GetComponent<Rigidbody>().velocity = velocity;
-
-            Debug.LogError("RpcSyncBullet position: " + bullet.transform.position + " // rotation: " + bullet.transform.rotation
-                + " // velocity: " + bullet.GetComponent<Rigidbody>().velocity);
         }
         else
         {
@@ -410,7 +406,7 @@ public class Player_Control : NetworkBehaviour
     //[ClientRpc]
     void RpcplayerDies()
     {
-
+        GetComponent<MeshRenderer>().material.color = new Color32(255, 255, 255, 0);
     }
 
     /*IEnumerator Respawn()
@@ -492,7 +488,7 @@ public class Player_Control : NetworkBehaviour
 
         Scene gameScene = SceneManager.GetActiveScene();
 
-        if(gameScene.name == "Gameplay")
+        if (gameScene.name == "Gameplay")
         {
             mainCam = Camera.main;
 
@@ -605,7 +601,11 @@ public class Player_Control : NetworkBehaviour
         if (HP > damage)
             HP -= damage;
         else
+        {
             HP = 0;
+            somePlayerDie();
+        }
+            
     }
 
     int damage_Reducing(Vector3 player_pos, Vector3 bullet_pos, int damage)
@@ -629,4 +629,26 @@ public class Player_Control : NetworkBehaviour
         
         gm.game_Time_UI.text = string.Format(min + sec);
     }    */
+
+    public void setPlayerNumber(int size)
+    {
+        PlayerNumber = size;
+
+        Debug.LogWarning(PlayerNumber);
+    }
+
+    [Server]
+    public void somePlayerDie()
+    {
+        if(isServer)
+        {
+            PlayerNumber--;
+
+            if(PlayerNumber == 0)
+            {
+                
+            }
+        }
+    }
+
 }

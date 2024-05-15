@@ -115,7 +115,7 @@ public class Bullet_Pool : NetworkBehaviour
 
             if (bulletControl != null)
             {
-                bulletControl.setBulletPool(this);
+                bulletControl.setBulletPool();
                 bulletControl.setGameManager();
             }
             else

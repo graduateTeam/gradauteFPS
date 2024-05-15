@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
 {
     public int Data { get; set; }
 
+    private int gamePlayer;
+
     public Image HP_bar;
     public TextMeshProUGUI HP_text;
     //public Image Respawn_bar;
@@ -100,9 +102,6 @@ public class GameManager : MonoBehaviour
 
         minute = 5;
         second = 0;
-
-        Red_kill = 0;
-        Blue_kill = 0;
     }
 
     public float[] Time_go()    //시간 가기
@@ -116,20 +115,6 @@ public class GameManager : MonoBehaviour
         second = Mathf.Floor(second);
 
         return new float[] { minute, second };
-    }
-
-    public int[] Who_kill(string team) //누군가 죽이면 킬 수 올리기
-    {
-        if (team.Equals("red"))
-        {
-            Red_kill += 1;
-        }
-        else
-        {
-            Blue_kill += 1;
-        }
-
-        return new int[] { Red_kill, Blue_kill };
     }
 
     public Boolean Time_isMinus()

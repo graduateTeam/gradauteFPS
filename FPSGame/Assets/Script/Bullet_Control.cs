@@ -265,8 +265,8 @@ public class Bullet_Control : NetworkBehaviour
         gm_instance = GameManager.instance;
     }
 
-    public void setBulletPool(Bullet_Pool bulletPool)
+    public void setBulletPool()
     {
-        bp = bulletPool;
+        bp = Bullet_Pool.instance;
     }
 }
