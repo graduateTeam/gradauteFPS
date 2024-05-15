@@ -6,10 +6,12 @@ using JetBrains.Annotations;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
 using UnityEngine.UIElements;
+using Cursor = UnityEngine.Cursor;
 
 public class Player_Control : NetworkBehaviour
 {
     // Start is called before the first frame update
+    public int PlayerNumber;
 
     public bool alive;
     public bool isJump;
@@ -82,7 +84,7 @@ public class Player_Control : NetworkBehaviour
         AssaultRifle = GetComponentInChildren<WeaponAssaultRifle>();
         attackRate = AssaultRifle.weapon_attackRate();
 
-        if(isLocalPlayer)
+        if (isLocalPlayer)
         {
             Game_Setting(Attack_point);
             InitializeWeapon();
@@ -158,13 +160,17 @@ public class Player_Control : NetworkBehaviour
         if (gm != null)
             gm.HP_UI_Update(HP);
 
-        if(bc != null)
+        if (bc != null)
             bc.setWeaponInfo(Head, AssaultRifle);
+        if (gm.PlayerCount == 1)
+        {
+            CmdplayerWins();
+        }
     }
 
     public void Rebound()   //반동함수
     {
-        if(!isLocalPlayer) return;
+        if (!isLocalPlayer) return;
 
         if (AssaultRifle.canShoot && !canFire)
         {
@@ -247,7 +253,7 @@ public class Player_Control : NetworkBehaviour
             {
                 if (isLocalPlayer && canFire && NetworkClient.ready)
                 {
-                    Debug.Log("Movement Fire!"+isOwned);
+                    Debug.Log("Movement Fire!" + isOwned);
                     //CmdFire();
                     Bullet_Shoot();
                 }
@@ -272,7 +278,7 @@ public class Player_Control : NetworkBehaviour
 
     public override void OnStartClient()
     {
-        if(isLocalPlayer)
+        if (isLocalPlayer)
         {
             Debug.Log("I'm Client!");
             CmdRequestComponents();
@@ -390,7 +396,7 @@ public class Player_Control : NetworkBehaviour
             Debug.LogWarning($"Bullet with netId {bulletNetId} not found in NetworkClient.spawned");
         }
     }
-    
+
 
     IEnumerator Weapon_delay()
     {
@@ -398,7 +404,7 @@ public class Player_Control : NetworkBehaviour
         canFire = true;
     }
 
-    //[ClientRpc]
+    
     void CmdplayerDies()
     {
         alive = false;
@@ -406,12 +412,25 @@ public class Player_Control : NetworkBehaviour
         RpcplayerDies();
         //StartCoroutine("Respawn");
     }
+    public void LoadSceneByName(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
+    }
 
-    //[ClientRpc]
     void RpcplayerDies()
     {
-
+        //gm.HP_UI_Update(HP);
+        this.gameObject.SetActive(false);
+        LoadSceneByName("Loser");
+        Cursor.lockState = CursorLockMode.None;
     }
+    void CmdplayerWins()
+    {
+        this.gameObject.SetActive(false);
+        LoadSceneByName("Winner");
+        Cursor.lockState= CursorLockMode.None;
+    }
+    
 
     /*IEnumerator Respawn()
     {
@@ -463,11 +482,11 @@ public class Player_Control : NetworkBehaviour
         {
             if (NetworkServer.active && NetworkClient.ready)
             {
-                if(isServer)
+                if (isServer)
                 {
                     OSOPRoomManager.GameStart();
                 }
-                    
+
 
             }
             else
@@ -492,7 +511,7 @@ public class Player_Control : NetworkBehaviour
 
         Scene gameScene = SceneManager.GetActiveScene();
 
-        if(gameScene.name == "Gameplay")
+        if (gameScene.name == "Gameplay")
         {
             mainCam = Camera.main;
 
@@ -590,22 +609,36 @@ public class Player_Control : NetworkBehaviour
             Vector3 player_pos = transform.position;
             Vector3 bullet_pos = other.transform.position;
 
-            Hitted_Bullet(damage_Reducing(player_pos, bullet_pos, 10));
-
+            Hitted_Bullet(10/*damage_Reducing(player_pos, bullet_pos, 10)*/);
+            gm.HitDamage.SetActive(true);
+            // 코루틴 시작
+            StartCoroutine(DeactivateAfterDelay(5.0f));
         }
+    }
+
+    IEnumerator DeactivateAfterDelay(float delay)
+    {
+        // 지정된 시간(초)만큼 대기
+        yield return new WaitForSeconds(delay);
+
+        // 대기 시간이 끝난 후 실행할 코드
+        gm.HitDamage.SetActive(false);
     }
 
     public void Hitted_Bullet(int damage)   //CmdReduceHP의 외부접근을 위한 함수 피 깎는 함수
     {
         CmdReduceHP(damage);
     }
-
+    
     void CmdReduceHP(int damage)
     {
         if (HP > damage)
             HP -= damage;
         else
+        {
             HP = 0;
+
+        }
     }
 
     int damage_Reducing(Vector3 player_pos, Vector3 bullet_pos, int damage)
@@ -629,4 +662,11 @@ public class Player_Control : NetworkBehaviour
         
         gm.game_Time_UI.text = string.Format(min + sec);
     }    */
+
+    public void setPlayerNumber(OSOPRoomManager osop)
+    {
+        PlayerNumber = osop.playerCount();
+
+        Debug.LogWarning(PlayerNumber);
+    }
 }

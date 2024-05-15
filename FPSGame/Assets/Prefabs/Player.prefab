@@ -1611,6 +1611,8 @@ MonoBehaviour:
   syncDirection: 1
   syncMode: 0
   syncInterval: 0.1
+  HitDamage: {fileID: 4920543842275664489, guid: 75c4e607ff97d784e874ff2ae5afd781, type: 3}
+  PlayerNumber: 0
   alive: 1
   isJump: 0
   wasd: 1
@@ -1634,7 +1636,7 @@ MonoBehaviour:
   origin_recoilRecoverySpeed: 0
   Attack_point: {fileID: 7143459289449910164}
   rb_player: {fileID: 5838064515702829384}
-  rb_weapon: {fileID: 5685436817879853350}
+  rb_weapon: {fileID: 5760633200790465122}
   Feet: {fileID: 8651077889297736909}
   bc: {fileID: 0}
   bp: {fileID: 7128443624517023840, guid: 1f404686026f2a14a8c873e707ff3129, type: 3}
@@ -2720,14 +2722,14 @@ PrefabInstance:
       addedObject: {fileID: 7793589531393304380}
     - targetCorrespondingSourceObject: {fileID: -5520790981654203718, guid: 7ee290c88843d2c49be639ef4dea8a73, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5685436817879853350}
+      addedObject: {fileID: 5760633200790465122}
   m_SourcePrefab: {fileID: 100100000, guid: 7ee290c88843d2c49be639ef4dea8a73, type: 3}
 --- !u!1 &4942653949117811941 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -5520790981654203718, guid: 7ee290c88843d2c49be639ef4dea8a73, type: 3}
   m_PrefabInstance: {fileID: 8644061685814623839}
   m_PrefabAsset: {fileID: 0}
---- !u!54 &5685436817879853350
+--- !u!54 &5760633200790465122
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

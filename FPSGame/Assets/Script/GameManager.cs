@@ -3,11 +3,16 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using Mirror;
+using System.Collections;
+using Mirror.Examples.CCU;
+using System.Threading;
 /*
 * UI관련 및 Map 좌표 정리 등등...
 */
 public class GameManager : MonoBehaviour
 {
+    public int PlayerCount;
+    public GameObject HitDamage;
     public int Data { get; set; }
 
     public Image HP_bar;
@@ -49,7 +54,18 @@ public class GameManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
     }
+    private void Update()
+    {
+        //int playerCount = CountActivePlayers();
+        StartCoroutine(CountActivePlayersRoutine());
+        //Debug.Log($"Active Player Count: {playerCount}");
 
+    }
+    private IEnumerator CountActivePlayersRoutine()
+    {
+            CountActivePlayers();
+            yield return new WaitForSeconds(1f); // 다음 실행까지 1초 대기
+    }
     public void AimPos(Vector3 pos)
     {
         Vector3 viewportPos = Camera.main.WorldToViewportPoint(pos);
@@ -149,5 +165,21 @@ public class GameManager : MonoBehaviour
     {
         bc.setGameManager();
     }
+    public void CountActivePlayers()
+    {
+        int count = 0;
+        //int pastcount = 0;
+        GameObject[] gameObjects = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject go in gameObjects)
+        {
+            if (go.activeSelf && go.name=="Head")
+            {
+                count++;
+            }
+        }
+        PlayerCount = count;
+    }
+    // 이 구간부터는 새로 작성한 코드입니다.(Host가 서버를 종료시키는 test를 위함)
+
 }
 

@@ -7,6 +7,11 @@ public class OSOPRoomManager : NetworkRoomManager
     // 플레이어가 준비되었는지 확인하기 위한 리스트
     private static List<NetworkConnectionToClient> readyPlayers = new List<NetworkConnectionToClient>();
 
+    public int playerCount()
+    {
+        return readyPlayers.Count;
+    }
+
     public override void OnServerConnect(NetworkConnectionToClient conn)
     {
         base.OnServerConnect(conn);
@@ -47,7 +52,8 @@ public class OSOPRoomManager : NetworkRoomManager
             if (conn != null && conn.identity != null)
             {
                 var player = conn.identity.gameObject;
-                player.transform.position = new Vector3(0, 0, 0); // 위치 설정 로직
+                player.transform.position = new Vector3(50, 5, 0); // 위치 설정 로직
+                //player.GetComponent<Player_Control>().setPlayerNumber(new OSOPRoomManager());
                 Debug.Log($"Player Name: {player.name}, NetID: {conn.identity.netId}, IsLocalPlayer: {conn.identity.isLocalPlayer}");
             }
             else
@@ -69,7 +75,7 @@ public class OSOPRoomManager : NetworkRoomManager
     [Server]
     public void SerBulletManager(GameObject bulletManager)
     {
-        if(bulletManager.name.Equals("Bullet Manager"))
+        if (bulletManager.name.Equals("Bullet Manager"))
         {
             GameObject obj = Instantiate(bulletManager);
             NetworkServer.Spawn(obj);
