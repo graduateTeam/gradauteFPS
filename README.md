@@ -1,2 +1,2 @@
-# gradauteFPS
+# graduateFPS
 FPS for graduate
