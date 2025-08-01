@@ -1,2 +1,2 @@
 # graduateFPS
-FPS for graduate
+Unity Multiplay FPS Game for Graduate
